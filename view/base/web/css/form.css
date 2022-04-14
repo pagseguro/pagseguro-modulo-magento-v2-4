@@ -1,0 +1,24 @@
+/* Pagseguro_Payment */
+
+.container-pagseguropayment_cc .billing-address-details,
+
+.container-pagseguropayment_cc .installments select {
+    width: 225px;
+}
+.container-pagseguropayment_cc .cc-number {
+    position: relative;
+}
+.container-pagseguropayment_cc .cc-number .credit-card-types-container {
+    position: absolute;
+    margin-left: 174px;
+    margin-top: 29px;
+}
+
+.container-pagseguropayment_cc .cc-number .credit-card-types-container li.item {
+    display: none;
+}
+.container-pagseguropayment_cc .cc-number .credit-card-types-container li.item._active {
+    display: block;
+}
+
+

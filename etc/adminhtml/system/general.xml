@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PagSeguro
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to PagSeguro so we can send you a copy immediately.
+ *
+ * @category   PagSeguro
+ * @package    PagSeguro_Payment
+ * @author     PagSeguro
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="pagseguropayment_general" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>General</label>
+
+        <field id="oauth_button" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label></label>
+            <frontend_model>PagSeguro\Payment\Block\Adminhtml\Form\Field\OAuth</frontend_model>
+        </field>
+
+        <field id="sandbox" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Use Sandbox</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>pagseguropayment/general/sandbox</config_path>
+        </field>
+
+        <field id="show_payment_info" translate="label comment" type="select" sortOrder="30" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Show Payment Info at Success Page</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>pagseguropayment/general/show_payment_info</config_path>
+            <comment><![CDATA[If your store shows the payment info at success page, DON'T enable this feature]]></comment>
+        </field>
+
+        <field id="company_attribute" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Company Attribute</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Customer\Attributes</source_model>
+            <config_path>pagseguropayment/customer/company_attribute</config_path>
+            <comment>Customer attribute that identify the company's name</comment>
+        </field>
+
+        <field id="debug" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Enable Log Requests</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>pagseguropayment/general/debug</config_path>
+        </field>
+
+        <group id="pagseguropayment_address" translate="label" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Address Attributes</label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+
+            <field id="street" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Street</label>
+                <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Street</source_model>
+                <config_path>pagseguropayment/address/street</config_path>
+            </field>
+            <field id="number" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Number</label>
+                <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Street</source_model>
+                <config_path>pagseguropayment/address/number</config_path>
+            </field>
+            <field id="complement" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Complement</label>
+                <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Street</source_model>
+                <config_path>pagseguropayment/address/complement</config_path>
+                <comment>A complementary information about the address</comment>
+            </field>
+            <field id="district" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>District</label>
+                <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Street</source_model>
+                <config_path>pagseguropayment/address/district</config_path>
+            </field>
+        </group>
+    </group>
+</include>

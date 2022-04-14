@@ -1,0 +1,66 @@
+<?php
+/**
+ * PagSeguro
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to PagSeguro so we can send you a copy immediately.
+ *
+ * @category   PagSeguro
+ * @package    PagSeguro_Payment
+ * @author     PagSeguro
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/** @var \PagSeguro\Payment\Block\Customer\Cards $block */
+$cards = $block->getCards();
+$formKey = $block->getFormKey();
+?>
+
+<legend class="legend">
+    <span><?= __('My Saved Cards') ?></span>
+</legend>
+
+<?php if ($cards && $cards->getSize()) : ?>
+    <div class="table-wrapper my-credit-cards">
+        <table class="data table table-credit-cards" id="my-orders-table">
+            <caption class="table-caption"><?= $block->escapeHtml(__('My Saved Cards')) ?></caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col card-number"><?= $block->escapeHtml(__('Card Number')) ?></th>
+                <th scope="col" class="col brand"><?= $block->escapeHtml(__('Brand')) ?></th>
+                <th scope="col" class="col expire"><?= $block->escapeHtml(__('Expiration Date')) ?></th>
+                <th scope="col" class="col actions">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php
+            /** @var \PagSeguro\Payment\Model\Card $cards */
+            foreach ($cards as $card): ?>
+                <tr>
+                    <td scope="col" class="col card-number"><?= $block->escapeHtml(sprintf('xxxx-xxxx-xxxx-%s', $card->getCcLast4())) ?></td>
+                    <td scope="col" class="col card-number"><?= $block->escapeHtml($card->getCcType()) ?></td>
+                    <td scope="col" class="col expire">
+                        <?= $block->escapeHtml($block->getExpirationDate($card)) ?>
+                    </td>
+                    <td scope="col" class="col actions">
+                        <a onclick="return confirm('<?= __('Are you sure?') ?>')" href="<?= $block->getDeleteUrl($card->getId(), $formKey) ?>">
+                            <?= __('Delete') ?>
+                        </a>
+                    </td>
+                </tr>
+
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+<?php else: ?>
+    <div class="message info empty"><span><?= $block->escapeHtml(__('You have no saved cards.')) ?></span></div>
+<?php endif ?>

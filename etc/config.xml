@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PagSeguro
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to PagSeguro so we can send you a copy immediately.
+ *
+ * @category   PagSeguro
+ * @package    PagSeguro_Payment
+ * @author     PagSeguro
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <pagseguropayment>
+            <general>
+                <public_key/>
+                <token/>
+                <encryption_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <api_url>https://api.pagseguro.com/</api_url>
+                <sandbox_url>https://sandbox.api.pagseguro.com/</sandbox_url>
+                <oauth_url>https://connect.pagseguro.uol.com.br/oauth2/authorize</oauth_url>
+                <oauth_sandbox_url>https://connect.sandbox.pagseguro.uol.com.br/oauth2/authorize</oauth_sandbox_url>
+                <refund_on_cancel>1</refund_on_cancel>
+                <show_payment_info>0</show_payment_info>
+            </general>
+
+            <endpoints>
+                <orders>orders</orders>
+                <order_consult>orders/{{id}}</order_consult>
+                <charge>charges</charge>
+                <consult>charges/{{id}}</consult>
+                <capture>charges/{{id}}/capture</capture>
+                <cancel>charges/{{id}}/cancel</cancel>
+                <check_authentication>public-keys/card</check_authentication>
+                <oauth_token>oauth2/token</oauth_token>
+                <oauth_revoke>oauth2/revoke</oauth_revoke>
+            </endpoints>
+
+            <application>
+                <client_id>1782a592-5eea-442c-8e67-c940d020dc53</client_id>
+                <cipher_text>TDTmdLh3LyGKMrRqdg6CLF4FxWhSBDRMYFqG7o4EwUIS6vESXJCmtjjzdX8NY+ggxLci6dcZrNfnYYezdY/wSi/sdNNzijSDgjVX5nRSdExr8DXPdlgTlEAKg8iZFeoFvtxJZPqgxeEJVjZ3bwRm2nYGU/YPXTH5wk+w2LOKeaSEfewgMfiElFZW8F9ay+Exwivmxosa8nqQzlmLyJhBnvYLjHJuaXy+lAjFyFSQh75gHnr3bGcKGZx2roDnozFLQlMf+ix4RywVaMg0+5Y3Z8BaYwIjtyX0gddgi4hRm2nFVFVaAHf2uFWvUlLGMNZiLhCpixe9tjFJ25Qlcuf+sA==</cipher_text>
+                <code_verifier></code_verifier>
+                <code_challenge></code_challenge>
+            </application>
+        </pagseguropayment>
+
+        <payment>
+            <pagseguropayment_ticket>
+                <active>0</active>
+                <model>PagSeguroPaymentTicketFacade</model>
+                <title>PagSeguro - Boleto</title>
+                <payment_action>order</payment_action>
+                <order_status>pending</order_status>
+                <paid_order_status>processing</paid_order_status>
+                <allowspecific>1</allowspecific>
+                <specificcountry>BR</specificcountry>
+
+                <!-- Method config -->
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <can_order>1</can_order>
+                <can_cancel>1</can_cancel>
+                <can_refund>1</can_refund>
+                <can_edit>0</can_edit>
+                <paymentInfoKeys>id,authorization_code,status</paymentInfoKeys>
+                <privateInfoKeys>id,authorization_code,status</privateInfoKeys>
+                <debug>1</debug>
+            </pagseguropayment_ticket>
+
+            <pagseguropayment_pix>
+                <active>0</active>
+                <model>PagSeguroPaymentPixFacade</model>
+                <title>PagSeguro - Pix</title>
+                <payment_action>order</payment_action>
+                <order_status>pending</order_status>
+                <paid_order_status>processing</paid_order_status>
+                <allowspecific>1</allowspecific>
+                <specificcountry>BR</specificcountry>
+
+                <!-- Method config -->
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <can_order>1</can_order>
+                <can_cancel>1</can_cancel>
+                <can_refund>1</can_refund>
+                <can_edit>0</can_edit>
+                <paymentInfoKeys>id,authorization_code,status</paymentInfoKeys>
+                <privateInfoKeys>id,authorization_code,status</privateInfoKeys>
+                <debug>1</debug>
+            </pagseguropayment_pix>
+
+            <pagseguropayment_one_cc>
+                <active>0</active>
+                <model>PagSeguroPaymentOneCreditCardFacade</model>
+                <title>PagSeguro - Cartão de Crédito</title>
+                <payment_action>authorize</payment_action>
+                <order_status>processing</order_status>
+                <has_interest>0</has_interest>
+                <cctypes>MC,VI</cctypes>
+                <can_save_cc>0</can_save_cc>
+                <interest_type>price</interest_type>
+                <interest_rate>1.99</interest_rate>
+                <interest_2_installments>4.5</interest_2_installments>
+                <interest_3_installments>5</interest_3_installments>
+                <interest_4_installments>5.5</interest_4_installments>
+                <interest_5_installments>6.5</interest_5_installments>
+                <interest_6_installments>7.5</interest_6_installments>
+                <interest_7_installments>8.5</interest_7_installments>
+                <interest_8_installments>9.5</interest_8_installments>
+                <interest_9_installments>10.5</interest_9_installments>
+                <interest_10_installments>11.5</interest_10_installments>
+                <interest_11_installments>12.5</interest_11_installments>
+                <interest_12_installments>14</interest_12_installments>
+                <max_installments>10</max_installments>
+                <max_installments_without_interest>10</max_installments_without_interest>
+                <minimum_installment_amount>5</minimum_installment_amount>
+                <allowspecific>1</allowspecific>
+                <specificcountry>BR</specificcountry>
+                <!-- Method config -->
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_order>1</can_order>
+                <can_capture_partial>1</can_capture_partial>
+                <can_use_internal>1</can_use_internal>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_edit>0</can_edit>
+                <masked_fields>cvv,cc_number</masked_fields>
+                <useccv>1</useccv>
+                <privateInfoKeys>id,authorizer_id,authorization_nsu,authorization_code,status</privateInfoKeys>
+                <paymentInfoKeys>id,authorizer_id,authorization_nsu,authorization_code,status</paymentInfoKeys>
+                <debug>1</debug>
+                <debugReplaceKeys>cvv,cc_number</debugReplaceKeys>
+            </pagseguropayment_one_cc>
+
+            <pagseguropayment_two_cc>
+                <active>0</active>
+                <model>PagSeguroPaymentTwoCreditCardFacade</model>
+                <title>PagSeguro - Pagamento com Dois Cartões</title>
+                <payment_action>authorize</payment_action>
+                <order_status>processing</order_status>
+                <has_interest>0</has_interest>
+                <cctypes>MC,VI</cctypes>
+                <can_save_cc>0</can_save_cc>
+                <interest_type>price</interest_type>
+                <interest_rate>1.99</interest_rate>
+                <interest_2_installments>4.5</interest_2_installments>
+                <interest_3_installments>5</interest_3_installments>
+                <interest_4_installments>5.5</interest_4_installments>
+                <interest_5_installments>6.5</interest_5_installments>
+                <interest_6_installments>7.5</interest_6_installments>
+                <interest_7_installments>8.5</interest_7_installments>
+                <interest_8_installments>9.5</interest_8_installments>
+                <interest_9_installments>10.5</interest_9_installments>
+                <interest_10_installments>11.5</interest_10_installments>
+                <interest_11_installments>12.5</interest_11_installments>
+                <interest_12_installments>14</interest_12_installments>
+                <max_installments>10</max_installments>
+                <max_installments_without_interest>10</max_installments_without_interest>
+                <minimum_installment_amount>5</minimum_installment_amount>
+                <allowspecific>1</allowspecific>
+                <specificcountry>BR</specificcountry>
+                <!-- Method config -->
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_order>1</can_order>
+                <can_capture_partial>0</can_capture_partial>
+                <can_use_internal>1</can_use_internal>
+                <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_edit>0</can_edit>
+                <masked_fields>cvv,cc_number</masked_fields>
+                <useccv>1</useccv>
+                <privateInfoKeys>id,authorizer_id,authorization_nsu,authorization_code,status</privateInfoKeys>
+                <paymentInfoKeys>id,authorizer_id,authorization_nsu,authorization_code,status</paymentInfoKeys>
+                <debug>1</debug>
+                <debugReplaceKeys>cvv,cc_number</debugReplaceKeys>
+            </pagseguropayment_two_cc>
+        </payment>
+    </default>
+</config>

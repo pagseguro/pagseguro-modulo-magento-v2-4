@@ -1,0 +1,522 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PagSeguro
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to PagSeguro so we can send you a copy immediately.
+ *
+ * @category   PagSeguro
+ * @package    PagSeguro_Payment
+ * @author     PagSeguro
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="PagSeguro\Payment\Logger\Handler\System">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="PagSeguro\Payment\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="PagSeguro\Payment\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">pagseguropayment</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">PagSeguro\Payment\Logger\Handler\System</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="PagSeguroPaymentOneCreditCardFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">PagSeguro\Payment\Block\Info\OneCreditCard</argument>
+            <argument name="valueHandlerPool" xsi:type="object">PagSeguroPaymentOneCreditCardValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">PagSeguroPaymentOneCreditCardCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTwoCreditCardFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">PagSeguro\Payment\Block\Info\TwoCreditCard</argument>
+            <argument name="valueHandlerPool" xsi:type="object">PagSeguroPaymentTwoCreditCardValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">PagSeguroPaymentTwoCreditCardCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTicketFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\PagSeguro\Payment\Model\Ticket\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">PagSeguro\Payment\Block\Info\Ticket</argument>
+            <argument name="valueHandlerPool" xsi:type="object">PagSeguroPaymentTicketValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">PagSeguroPaymentTicketCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentPixFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">PagSeguro\Payment\Block\Info\Pix</argument>
+            <argument name="valueHandlerPool" xsi:type="object">PagSeguroPaymentPixValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">PagSeguroPaymentPixCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Configuration reader -->
+    <virtualType name="PagSeguroPaymentOneCreditCardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTwoCreditCardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTicketConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\PagSeguro\Payment\Model\Ticket\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentPixConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="PagSeguro\Payment\Gateway\Http\Client\Transaction">
+        <arguments>
+            <argument name="helper" xsi:type="object">PagSeguro\Payment\Helper\Data</argument>
+        </arguments>
+    </type>
+
+    <type name="PagSeguro\Payment\Gateway\Http\Client\Capture">
+        <arguments>
+            <argument name="helper" xsi:type="object">PagSeguro\Payment\Helper\Data</argument>
+        </arguments>
+    </type>
+
+    <type name="PagSeguro\Payment\Gateway\Http\Client\Refund">
+        <arguments>
+            <argument name="helper" xsi:type="object">PagSeguro\Payment\Helper\Data</argument>
+        </arguments>
+    </type>
+
+    <!-- Commands infrastructure -->
+    <virtualType name="PagSeguroPaymentOneCreditCardCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">PagSeguroPaymentOneCreditCardAuthorizeCommand</item>
+                <item name="order" xsi:type="string">PagSeguroPaymentOneCreditCardOrderCommand</item>
+                <item name="capture" xsi:type="string">PagSeguroPaymentOneCreditCardCaptureCommand</item>
+                <item name="void" xsi:type="string">PagSeguroPaymentRefundCommand</item>
+                <item name="cancel" xsi:type="string">PagSeguroPaymentRefundCommand</item>
+                <item name="refund" xsi:type="string">PagSeguroPaymentRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTwoCreditCardCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">PagSeguroPaymentTwoCreditCardAuthorizeCommand</item>
+                <item name="order" xsi:type="string">PagSeguroPaymentTwoCreditCardOrderCommand</item>
+                <item name="capture" xsi:type="string">PagSeguroPaymentTwoCreditCardCaptureCommand</item>
+                <item name="void" xsi:type="string">PagSeguroPaymentTwoCreditCardRefundCommand</item>
+                <item name="cancel" xsi:type="string">PagSeguroPaymentTwoCreditCardRefundCommand</item>
+                <item name="refund" xsi:type="string">PagSeguroPaymentTwoCreditCardRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTicketCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="order" xsi:type="string">PagSeguroPaymentTicketOrderCommand</item>
+                <item name="refund" xsi:type="string">PagSeguroPaymentRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentPixCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="order" xsi:type="string">PagSeguroPaymentPixOrderCommand</item>
+                <item name="refund" xsi:type="string">PagSeguroPaymentRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- ############ INIT TICKET COMMANDS ############ -->
+    <!-- Order command  -->
+    <virtualType name="PagSeguroPaymentTicketOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguroPaymentTicketOrderRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguroPaymentTicketResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="validatorPool" xsi:type="object">PagSeguroPaymentValidatorPool</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Order Request -->
+    <virtualType name="PagSeguroPaymentTicketOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguroPaymentTicketTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTicketTransactionRequest" type="PagSeguro\Payment\Gateway\Request\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentTicketConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund command -->
+    <virtualType name="PagSeguroPaymentRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguro\Payment\Gateway\Request\RefundRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguro\Payment\Gateway\Response\RefundHandler</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Refund</argument>
+        </arguments>
+    </virtualType>
+    <!-- ############ END TICKET COMMANDS ############ -->
+
+    <!-- ############ INIT Pix COMMANDS ############ -->
+    <!-- Order command  -->
+    <virtualType name="PagSeguroPaymentPixOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguroPaymentPixOrderRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguroPaymentPixResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="validatorPool" xsi:type="object">PagSeguroPaymentValidatorPool</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Order Request -->
+    <virtualType name="PagSeguroPaymentPixOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguroPaymentPixTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentPixTransactionRequest" type="PagSeguro\Payment\Gateway\Request\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentPixConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund command -->
+    <virtualType name="PagSeguroPaymentRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguro\Payment\Gateway\Request\RefundRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguro\Payment\Gateway\Response\RefundHandler</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Refund</argument>
+        </arguments>
+    </virtualType>
+    <!-- ############ END Pix COMMANDS ############ -->
+
+    <!-- ############ INIT ONE CARD COMMANDS ############ -->
+    <!-- Authorize command -->
+    <virtualType name="PagSeguroPaymentOneCreditCardAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguroPaymentAuthorizationRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguroPaymentCreditCardResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="validatorPool" xsi:type="object">PagSeguroPaymentValidatorPool</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorization Request -->
+    <virtualType name="PagSeguroPaymentAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguroCreditCardTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroCreditCardTransactionRequest" type="PagSeguro\Payment\Gateway\Request\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentOneCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Order command -->
+    <virtualType name="PagSeguroPaymentOneCreditCardOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguroPaymentCreditCardOrderRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguroPaymentCreditCardResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="validatorPool" xsi:type="object">PagSeguroPaymentValidatorPool</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Order (Sale) Request -->
+    <virtualType name="PagSeguroPaymentCreditCardOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguro\Payment\Gateway\Request\SaleRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="PagSeguro\Payment\Gateway\Request\SaleRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentOneCreditCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Capture command -->
+    <virtualType name="PagSeguroPaymentOneCreditCardCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguro\Payment\Gateway\Request\CaptureRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguro\Payment\Gateway\Response\CaptureHandler</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Capture</argument>
+        </arguments>
+    </virtualType>
+    <!-- ############ END ONE CARD COMMANDS ############ -->
+
+
+    <!-- ############ INIT TWO CARDS COMMANDS ############ -->
+    <!-- Authorize command -->
+    <virtualType name="PagSeguroPaymentTwoCreditCardAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguroPaymentTwoCreditCardAuthorizationRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguroPaymentTwoCreditCardResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="validatorPool" xsi:type="object">PagSeguroPaymentValidatorPool</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorization Request -->
+    <virtualType name="PagSeguroPaymentTwoCreditCardAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguroPaymentTwoCreditCardTransactionRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTwoCreditCardTransactionRequest" type="PagSeguro\Payment\Gateway\Request\TwoCreditCard\TransactionRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentTwoCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Order command -->
+    <virtualType name="PagSeguroPaymentTwoCreditCardOrderCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguroPaymentTwoCreditCardOrderRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguroPaymentTwoCreditCardResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="validatorPool" xsi:type="object">PagSeguroPaymentValidatorPool</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Order (Sale) Request -->
+    <virtualType name="PagSeguroPaymentTwoCreditCardOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguro\Payment\Gateway\Request\TwoCreditCard\SaleRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="PagSeguro\Payment\Gateway\Request\TwoCreditCard\SaleRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentTwoCreditCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Capture command -->
+    <virtualType name="PagSeguroPaymentTwoCreditCardCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguro\Payment\Gateway\Request\TwoCreditCard\CaptureRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguro\Payment\Gateway\Response\TwoCreditCard\CaptureHandler</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\TwoCreditCard\Capture</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund command -->
+    <virtualType name="PagSeguroPaymentTwoCreditCardRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PagSeguro\Payment\Gateway\Request\TwoCreditCard\RefundRequest</argument>
+            <argument name="handler" xsi:type="object">PagSeguro\Payment\Gateway\Response\TwoCreditCard\RefundHandler</argument>
+            <argument name="transferFactory" xsi:type="object">PagSeguro\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">PagSeguro\Payment\Gateway\Http\Client\TwoCreditCard\Refund</argument>
+        </arguments>
+    </virtualType>
+    <!-- ############ END TWO CARDS COMMANDS ############ -->
+
+
+    <!-- Validators -->
+    <virtualType name="PagSeguroPaymentValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">PagSeguroPaymentCountryValidator</item>
+                <item name="responseCode" xsi:type="string">PagSeguro\Payment\Gateway\Validator\ResponseCodeValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PagSeguroPaymentCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Response handlers -->
+    <virtualType name="PagSeguroPaymentCreditCardResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguro\Payment\Gateway\Response\TransactionHandler</item>
+                <item name="creditCard" xsi:type="string">PagSeguro\Payment\Gateway\Response\OneCreditCardHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTwoCreditCardResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguro\Payment\Gateway\Response\TwoCreditCard\TransactionHandler</item>
+                <item name="creditCard" xsi:type="string">PagSeguro\Payment\Gateway\Response\TwoCreditCard\TwoCreditCardHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTicketResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguro\Payment\Gateway\Response\TransactionHandler</item>
+                <item name="ticket" xsi:type="string">PagSeguro\Payment\Gateway\Response\TicketHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentPixResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="transaction" xsi:type="string">PagSeguro\Payment\Gateway\Response\TransactionHandler</item>
+                <item name="pix" xsi:type="string">PagSeguro\Payment\Gateway\Response\PixHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="PagSeguroPaymentOneCreditCardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">PagSeguroPaymentOneCreditCardConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTwoCreditCardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">PagSeguroPaymentTwoCreditCardConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTicketValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">PagSeguroPaymentTicketConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentPixValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">PagSeguroPaymentPixConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PagSeguroPaymentOneCreditCardConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">PagSeguroPaymentOneCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTwoCreditCardConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">PagSeguroPaymentTwoCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentTicketConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">PagSeguroPaymentTicketConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PagSeguroPaymentPixConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">PagSeguroPaymentPixConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Info Blocks -->
+    <type name="PagSeguro\Payment\Block\Info\OneCreditCard">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentOneCreditCardConfig</argument>
+        </arguments>
+    </type>
+    <type name="PagSeguro\Payment\Block\Info\TwoCreditCard">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentTwoCreditCardConfig</argument>
+        </arguments>
+    </type>
+    <type name="PagSeguro\Payment\Block\Info\Ticket">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentTicketConfig</argument>
+        </arguments>
+    </type>
+    <type name="PagSeguro\Payment\Block\Info\Pix">
+        <arguments>
+            <argument name="config" xsi:type="object">PagSeguroPaymentPixConfig</argument>
+        </arguments>
+    </type>
+
+    <preference for="PagSeguro\Payment\Api\Data\TransactionInterface" type="PagSeguro\Payment\Model\Transaction"/>
+    <preference for="PagSeguro\Payment\Api\TransactionRepositoryInterface" type="PagSeguro\Payment\Model\ResourceModel\TransactionRepository"/>
+    <preference for="PagSeguro\Payment\Api\Data\TransactionSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <preference for="PagSeguro\Payment\Api\Data\CardInterface" type="PagSeguro\Payment\Model\Card"/>
+    <preference for="PagSeguro\Payment\Api\CardRepositoryInterface" type="PagSeguro\Payment\Model\ResourceModel\CardRepository"/>
+    <preference for="PagSeguro\Payment\Api\Data\CardSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <type name="PagSeguro\ItemsReport\Cron\FlatTable">
+        <plugin name="pagseguro_pagseguropayment_pagseguro_itemsreport_insert_column_cc_type" type="PagSeguro\Payment\Observer\ItemsReport\Column\CcType" sortOrder="999" disabled="false"/>
+    </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="pagseguro_payment_transaction_listing_data_source" xsi:type="string">PagSeguroPaymentTransactionCollection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="PagSeguroPaymentTransactionCollection" type="PagSeguro\Payment\Ui\DataProvider\Transaction\Listing\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">pagseguropayment_transactions</argument>
+            <argument name="resourceModel" xsi:type="string">PagSeguro\Payment\Model\ResourceModel\Transaction</argument>
+        </arguments>
+    </virtualType>
+</config>

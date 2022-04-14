@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * PagSeguro
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to PagSeguro so we can send you a copy immediately.
+ *
+ * @category   PagSeguro
+ * @package    PagSeguro_Payment
+ * @author     PagSeguro
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="pagseguropayment_one_cc" translate="label comment" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>One Credit Card</label>
+
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/pagseguropayment_one_cc/active</config_path>
+        </field>
+
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Title</label>
+            <config_path>payment/pagseguropayment_one_cc/title</config_path>
+        </field>
+
+        <field id="payment_action" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Payment Action</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\PaymentAction</source_model>
+            <config_path>payment/pagseguropayment_one_cc/payment_action</config_path>
+        </field>
+
+        <field id="cctypes" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Allowed Brands</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\CcType</source_model>
+            <config_path>payment/pagseguropayment_one_cc/cctypes</config_path>
+        </field>
+
+        <field id="can_save_cc" translate="label" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Can Save Credit Card</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/pagseguropayment_one_cc/can_save_cc</config_path>
+        </field>
+
+        <field id="use_encrypted_card" translate="label comment" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Use PagSeguro Encrypted Card</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/pagseguropayment_one_cc/use_encrypted_card</config_path>
+            <comment>If enabled will not be possible allow customer save card.</comment>
+        </field>
+
+        <field id="order_status" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>New Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+            <config_path>payment/pagseguropayment_one_cc/order_status</config_path>
+        </field>
+
+        <field id="paid_order_status" translate="label" type="select" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Paid Order Status</label>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+            <config_path>payment/pagseguropayment_one_cc/paid_order_status</config_path>
+        </field>
+
+        <field id="max_installments" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Max Installments</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Installments</source_model>
+            <config_path>payment/pagseguropayment_one_cc/max_installments</config_path>
+        </field>
+
+        <field id="max_installments_without_interest" translate="label" type="select" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Max Installments Without Interest</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Installments</source_model>
+            <config_path>payment/pagseguropayment_one_cc/max_installments_without_interest</config_path>
+        </field>
+
+        <field id="minimum_installment_amount" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Minimum Installment Amount</label>
+            <config_path>payment/pagseguropayment_one_cc/minimum_installment_amount</config_path>
+            <validate>validate-greater-than-zero</validate>
+        </field>
+
+        <field id="has_interest" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Has Interest</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/pagseguropayment_one_cc/has_interest</config_path>
+        </field>
+
+        <field id="interest_type" translate="label" type="select" sortOrder="201" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Interest Type</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\InterestType</source_model>
+            <config_path>payment/pagseguropayment_one_cc/interest_type</config_path>
+            <depends>
+                <field id="has_interest">1</field>
+            </depends>
+        </field>
+
+        <field id="interest_rate" translate="label comment" type="text" sortOrder="202" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Interest rate</label>
+            <config_path>payment/pagseguropayment_one_cc/interest_rate</config_path>
+            <frontend_class>validate-number</frontend_class>
+            <comment>Number format with dot (.) as decimal separator</comment>
+            <depends>
+                <field id="has_interest">1</field>
+                <field id="interest_type" separator=",">price,compound,simple</field>
+            </depends>
+        </field>
+
+        <group id="pagseguropayment_one_cc_interest_installments" translate="label comment" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Interest Per Installments</label>
+            <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+            <comment>It'll charge the interest based on installments saved below</comment>
+            <depends>
+                <field id="has_interest">1</field>
+                <field id="interest_type">per_installments</field>
+            </depends>
+
+            <field id="interest_2_installments" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 2 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_2_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_3_installments" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 3 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_3_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_4_installments" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 4 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_4_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_5_installments" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 5 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_5_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_6_installments" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 6 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_6_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_7_installments" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 7 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_7_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_8_installments" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 8 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_8_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_9_installments" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 9 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_9_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_10_installments" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 10 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_10_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_11_installments" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 11 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_11_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+            <field id="interest_12_installments" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Interest orders with 12 installments</label>
+                <config_path>payment/pagseguropayment_one_cc/interest_12_installments</config_path>
+                <validate>validate-number</validate>
+            </field>
+        </group>
+
+        <field id="sort_order" translate="label" type="text" sortOrder="10000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/pagseguropayment_one_cc/sort_order</config_path>
+        </field>
+
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="10100" showInDefault="9" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Payment From Applicable Countries</label>
+            <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            <config_path>payment/pagseguropayment_one_cc/allowspecific</config_path>
+        </field>
+
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="10110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Payment From Specific Countries</label>
+            <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+            <config_path>payment/pagseguropayment_one_cc/specificcountry</config_path>
+            <depends>
+                <field id="allowspecific">1</field>
+            </depends>
+        </field>
+
+    </group>
+</include>
