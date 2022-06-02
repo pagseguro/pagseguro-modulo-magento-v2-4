@@ -88,7 +88,7 @@ class Data extends \Magento\Payment\Helper\Data
      * @param string $section
      * @return mixed
      */
-    public function getConfig($config, $group = 'pagseguropayment', $section = 'payment')
+    public function getConfig($config, $group = 'payment', $section = 'pagseguropayment')
     {
         return $this->scopeConfig->getValue(
             $section . '/' . $group . '/' . $config,
@@ -282,15 +282,20 @@ class Data extends \Magento\Payment\Helper\Data
     protected function getCodeChallenge()
     {
 
-        $code_verifier = $this->getCodeVerifier();
+        $codeVerifier = $this->getConfig('code_verifier', 'general');
 
-        $code_challenge = $this->base64url_encode(pack('H*', hash('sha256', $code_verifier)));
+        if (!$codeVerifier) {
+            $codeVerifier = $this->getCodeVerifier();
+            $this->saveConfig($codeVerifier, 'code_verifier');
+        }
 
-        $this->saveConfig('code_verifier', $code_verifier, 'application');
+        $codeChallenge = $this->base64url_encode(pack('H*', hash('sha256', $codeVerifier)));
+        $this->saveConfig($codeChallenge, 'code_challenge');
 
-        $this->saveConfig('code_challenge', $code_challenge, 'application');
-
-        return $code_challenge;
+        return [
+            'challenge'     => $codeChallenge,
+            'verifier'      => $codeVerifier,
+        ];
 
     }
 
@@ -303,12 +308,14 @@ class Data extends \Magento\Payment\Helper\Data
             $oAuthURL = $this->getGeneralConfig('oauth_sandbox_url');
         }
 
+        $code = $this->getCodeChallenge();
+
         $params = array(
-            'response_type' => 'code',
-            'client_id' =>  $this->getApplicationConfig('client_id'),
-            'scope' => 'payments.read+payments.create+payments.refund',
-            'state' => 'active',
-            'code_challenge' => $this->getCodeChallenge(),
+            'response_type'         => 'code',
+            'client_id'             =>  $this->getApplicationConfig('client_id'),
+            'scope'                 => 'payments.read+payments.create+payments.refund',
+            'state'                 => 'active',
+            'code_challenge'        => $code['challenge'],
             'code_challenge_method' => 'S256'
         );
 
@@ -318,6 +325,22 @@ class Data extends \Magento\Payment\Helper\Data
 
         $queryParams = str_replace('%2B', '+', $queryParams);
 
-        return $oAuthURL . '?' . $queryParams;
+        return [
+            'url'           => $oAuthURL . '?' . $queryParams,
+            'code_verifier' => $code['verifier'],
+            'cipher_text'   => $this->getApplicationConfig('cipher_text')
+        ];
+    }
+
+    public function getOAuthCodeUrl()
+    {
+        $oAuthURL = $this->getGeneralConfig('api_url');
+
+        if ($this->getGeneralConfig('sandbox')) {
+            $oAuthURL = $this->getGeneralConfig('sandbox_url');
+        }
+
+        return $oAuthURL . 'oauth2/token';
+
     }
 }

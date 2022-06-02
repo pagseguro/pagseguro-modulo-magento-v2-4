@@ -93,38 +93,47 @@ class PaymentConfigSaveAfter implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $groups = $this->request->getParam('groups');
-        if (!$groups || !isset($groups['pagseguropayment'])) {
-            return;
-        }
-
         //Clean cache to get new config data
         $this->cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
         $this->appConfig->reinit();
 
-        //Only if it has API KEY saved
-        if ($this->helper->getGeneralConfig('token')) {
-            $this->createPublicKey();
+        $this->helper->log('oauth_code');
+        $this->helper->log($this->helper->getGeneralConfig('oauth_code'));
+        if ($this->helper->getGeneralConfig('oauth_code')) {
+            $this->createToken();
         }
 
     }
 
     /**
-     * Generate Public Key Used on Encrypted Card
+     * Change code for token.
      */
-    protected function createPublicKey()
+    protected function createToken()
     {
-        $token = $this->helper->getGeneralConfig('token');
+        $this->helper->log('########## execuuuutaaaaaaa brasillll');
+        $code = $this->helper->getGeneralConfig('oauth_code');
 
-        $response = $this->api->credentialAuthentication()->get($token);
+        $data = [
+            'grant_type'    => 'authorization_code',
+            'code'          => $code,
+            'redirect_uri'  => $this->_storeManager->getStore()->getCurrentUrl(),
+            'code_verifier' => $this->helper->getConfig('code_verifier')
+        ];
+
+        $this->helper->log($data);
+
+        $response = $this->api->oAuth()->getAccessToken($data);
+
+        $this->helper->log($response);
+
 
         if ($response['status'] < 200 || $response['status'] >= 300) {
             $message = __('There was an error trying to validate your credential. Please check if your token is correct');
             $this->messageManager->addErrorMessage($message);
         }
 
-        if (isset($response['response']['public_key'])) {
-            $this->helper->saveConfig($response['response']['public_key'], 'public_key');
+        if (isset($response['response']['access_token'])) {
+            $this->helper->saveConfig($response['response']['access_token'], 'token');
         }
     }
 }

@@ -2,42 +2,27 @@ require(['jquery', 'Magento_Ui/js/modal/alert', 'mage/translate'], function ($, 
 
     const urlParams = new URLSearchParams(window.location.search)
 
-    const code = urlParams.get('code')
-
-    if (code) {
-
-        let sandbox = $('#payment_other_pagseguropayment_pagseguropayment_general_sandbox').val();
-
-        let endpoint = $('#pagseguro-oauth-button').data('exchange-url');
-
-        console.log(endpoint)
-
-        /* Remove previous success message if present */
-        if ($(".pagseguro-payment-credentials-success-message")) {
-
-            $(".pagseguro-payment-success-message").remove();
-
-        }
-
-        $.post(endpoint,{
-            code: code,
-            sandbox: sandbox
-        }).done(function (response) {
-        }).fail(function () {
+    $(document).ready(function() {
+        $('#row_payment_us_pagseguro_payment_options_pagseguropayment_general_oauth_code').css('display', 'none');
+        const code = urlParams.get('code')
+        const codeVerifier = urlParams.get('code_verifier')
+        if (code && codeVerifier) {
+            $('#payment_us_pagseguro_payment_options_pagseguropayment_general_oauth_code').val(code + '|' + codeVerifier);
+            $('#pagseguro-oauth-button-span').text('Salve as configurações...');
             alert({
-                title: $t('PagSeguro - Validation Failed'),
-                content: $t('Your PagSeguro token could not be validated. Please ensure you have selected the correct environment and entered a valid token.')
+                title: $t('PagSeguro - Salve suas Configurações'),
+                content: $t('Você precisa salvar as configurações para completar o processo de autenticação.')
             });
-        }).always(function () {
-        });
-
-    }
+        }
+    })
 
     window.paseguroOauthRedirect = function (url) {
 
         let redirectUrl = url;
 
-        redirectUrl = redirectUrl + '&redirect_uri=' + window.location.href
+        const codeVerifier = $('#pagseguro-oauth-button').attr('data-code-verifier')
+
+        redirectUrl = redirectUrl + '&redirect_uri=' + window.location.href + '?code_verifier=' + codeVerifier
 
         console.log(redirectUrl)
 
@@ -45,49 +30,9 @@ require(['jquery', 'Magento_Ui/js/modal/alert', 'mage/translate'], function ($, 
 
     }
 
-    window.paseguroOauthRemove = function (endpoint) {
-
-        console.log(endpoint)
-
-        let sandbox = $('#payment_other_pagseguropayment_pagseguropayment_general_sandbox').val();
-
-        /* Remove previous success message if present */
-        if ($(".pagseguro-payment-credentials-success-message")) {
-
-            $(".pagseguro-payment-success-message").remove();
-
-        }
-
-        /* Basic field validation */
-        var errors = [];
-
-        if (errors.length > 0) {
-            alert({
-                title: $t('PagSeguro - Remove Failed'),
-                content:  errors.join('<br />')
-            });
-            return false;
-        }
-
-        $(this).text($t("Removing your credentials...")).attr('disabled', true);
-
-        var self = this;
-
-        $.post(endpoint,{
-            sandbox: sandbox
-        }).done(function (response) {
-            console.log(response)
-            $('<div class="message message-success pagseguro-payment-success-message">' + $t("Your credentials were removed.") + '</div>').insertAfter(self);
-        }).fail(function () {
-            alert({
-                title: $t('PagSeguro - Removing Failed'),
-                content: $t('Your PagSeguro token could not be validated. Please ensure you have selected the correct environment and entered a valid token.')
-            });
-        }).always(function (response) {
-            console.log(response)
-            $(self).text($t("Reload this page")).attr('disabled', false);
-        });
-
+    window.paseguroOauthRemove = function () {
+        $('#payment_us_pagseguro_payment_options_pagseguropayment_general_oauth_code').val('revoke');
+        $('#pagseguro-oauth-button-span').text('Salve as configurações...');
     }
 
 });

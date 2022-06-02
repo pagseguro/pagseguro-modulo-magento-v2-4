@@ -69,7 +69,7 @@ class Pix extends AbstractInfo
     {
         $payment = $this->getInfo();
 
-        $expirationDate = $this->date->date('d/m/Y', $payment->getAdditionalInformation('due_date'));
+        $expirationDate = $this->date->date('d/m/Y', strtotime('tomorrow'));
 
         $pixPrintOptions = [];
         if ($payment->getAdditionalInformation('print_options')) {

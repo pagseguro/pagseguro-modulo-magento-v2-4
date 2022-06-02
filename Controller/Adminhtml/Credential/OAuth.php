@@ -92,7 +92,7 @@ class OAuth extends Action
             'grant_type'    => 'authorization_code',
             'code'          => $this->getRequest()->getParam('code'),
             'redirect_uri'  => '',
-            'code_verifier' => $this->helper->getApplicationConfig('code_verifier')
+            'code_verifier' => $this->helper->getConfig('code_verifier')
         ];
 
         $response = $this->api->oAuth()->getAccessToken($data, $url);

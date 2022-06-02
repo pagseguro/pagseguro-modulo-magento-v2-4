@@ -345,7 +345,7 @@ class TransactionRequest implements BuilderInterface
             'value' => $amount
         ];
 
-        $qrCodes->expiration_date = '2022-03-29T20:15:59-03:00';
+        $qrCodes->expiration_date = $this->date->date('Y-m-d\TH:i:s-H:i', strtotime('tomorrow'));
 
         return [$qrCodes];
     }

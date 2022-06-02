@@ -35,8 +35,8 @@ class OAuth extends Field
 
     public function __construct(Context $context, HelperData $helperData)
     {
-        parent::__construct($context);
         $this->helperData = $helperData;
+        parent::__construct($context);
     }
 
     /**
@@ -53,9 +53,12 @@ class OAuth extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $maybeToken = $this->helperData->getGeneralConfig('token');
 
-        if ($maybeToken) {
+        $maybeCodeVerifier = $this->helperData->getGeneralConfig('code_verifier');
+
+        $token = $this->helperData->getGeneralConfig('token');
+
+        if ($maybeCodeVerifier || $token) {
 
             // Replace field markup with validation button
             $title = __('Remover Autorização');
@@ -85,10 +88,10 @@ class OAuth extends Field
                     type=\"button\"
                     id=\"pagseguro-oauth-button\"
                     title=\"{$title}\"
-                    data-token=\"{$maybeToken}\"
                     class=\"button\"
+                    data-code-verifier=\"{$maybeCodeVerifier}\"
                     onclick=\"paseguroOauthRemove.call(this, '{$oauthEndpoint}')\">
-                    <span>{$title}</span>
+                    <span id=\"pagseguro-oauth-button-span\">{$title}</span>
                 </button>";
 
         } else {
@@ -119,20 +122,22 @@ class OAuth extends Field
 
             $oauthEndpoint = $this->getUrl('pagseguropayment/credential/oauth', ['storeId' => $storeId]);
 
+            $code_url = $this->helperData->getOAuthCodeUrl();
+
             $html = "
                 <button
                     type=\"button\"
                     id=\"pagseguro-oauth-button\"
                     title=\"{$title}\"
                     data-exchange-url=\"{$oauthEndpoint}\"
+                    data-code-url=\"{$code_url}\"
+                    data-code-verifier=\"{$oauthUrl['code_verifier']}\"
                     class=\"button\"
-                    onclick=\"paseguroOauthRedirect.call(this, '{$oauthUrl}')\">
+                    onclick=\"paseguroOauthRedirect.call(this, '{$oauthUrl['url']}')\">
                     <span>{$title}</span>
                 </button>";
 
         }
-
-
 
         return $html;
     }

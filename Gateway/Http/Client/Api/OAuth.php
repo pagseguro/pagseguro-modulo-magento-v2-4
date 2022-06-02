@@ -30,7 +30,7 @@ class OAuth extends Client
 
       $path = $this->getEndpointPath('oauth_token');
 
-      $this->setOAuthUrl($url);
+      $this->setServiceUrl($url);
 
       $api = $this->getApi($path, true);
 
