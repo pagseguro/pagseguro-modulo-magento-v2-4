@@ -89,21 +89,88 @@ class TwoCard extends \Magento\Payment\Helper\Data
         $incrementId = $this->payment->getOrder()->getIncrementId();
         $chargeData = new \stdClass();
         $chargeData->reference_id = $incrementId;
-        $chargeData->description = __(sprintf("Online Purchase - #%s", $incrementId));
-        $chargeData->amount = $this->getChargeAmount($amount);
-        $chargeData->payment_method = $this->getChargePaymentMethod();
+
+        $chargeData->customer = $this->getCustomerData();
+        $chargeData->items = $this->getItemsData($amount);
 
         $chargeData->notification_urls = [
             $this->helperData->getUrlBuilder()->getUrl('pagseguropayment/notification/orders')
         ];
 
+        $chargeData->charges = [$this->getChargesData($chargeData, $this->payment, $amount)];
+
         return ['request' => $chargeData];
+    }
+
+/**
+     * @return \stdClass
+     */
+    protected function getCustomerData()
+    {
+        $taxvat = $this->payment->getOrder()->getCustomerTaxvat() ?? $this->getCustomerTaxvat();
+
+        $customer = new \stdClass();
+        $customer->tax_id = $this->helperData->digits($taxvat);
+        $customer->name = $this->getCustomerName($customer->tax_id);
+        $customer->email = $this->payment->getOrder()->getCustomerEmail();
+        return $customer;
     }
 
     /**
      * @return \stdClass
      */
-    protected function getChargePaymentMethod()
+    protected function getItemsData($amount)
+    {
+        $items = new \stdClass();
+        $items->name = __(sprintf("Online Purchase - #%s", $this->payment->getOrder()->getIncrementId()));;
+        $items->quantity = 1;
+        $items->unit_amount = str_replace('.', '', $amount);
+        return [$items];
+    }
+
+    /**
+     * @return string|null
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getCustomerTaxvat()
+    {
+        $customer = false;
+        if ($customerId = $this->payment->getOrder()->getCustomerId()) {
+            $customer = $this->customer->getById($customerId);
+            $customerTaxvat = $customer ? $customer->getTaxvat() : null;
+        }
+        return $customerTaxvat ?? $this->payment->getOrder()->getBillingAddress()->getVatId();
+    }
+
+    /**
+     * @param \stdClass $request
+     * @param \Magento\Sales\Model\Order\Payment\Interceptor $payment
+     * @param float $amount
+     * @param string $buyerId
+     *
+     * @return \stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function getChargesData($request, $payment, $amount)
+    {
+        $charge = new \stdClass();
+        $charge->reference_id = $this->payment->getOrder()->getIncrementId();
+        $charge->description = __(sprintf("Online Purchase - #%s", $this->payment->getOrder()->getIncrementId()));
+        $charge->amount = $this->getChargeAmount($amount);
+        // Payment Method Data
+        $charge->payment_method = $this->getPaymentData($request, $payment, $amount);
+        $charge->notification_urls = [
+            $this->helperData->getUrlBuilder()->getUrl('pagseguropayment/notification/order')
+        ];
+        return $charge;
+    }
+
+
+    /**
+     * @return \stdClass
+     */
+    protected function getPaymentData()
     {
         $paymentMethod = new \stdClass();
         $paymentMethod->type = 'CREDIT_CARD';
@@ -125,28 +192,6 @@ class TwoCard extends \Magento\Payment\Helper\Data
             $card->encrypted = $encrypted;
             return $card;
         }
-
-        $card->security_code = $payment->getAdditionalInformation('second_cc_cid');
-
-        if ($token = $payment->getAdditionalInformation('second_cc_id')) {
-            $card->id = $token;
-            return $card;
-        }
-
-        $card->number = $payment->getAdditionalInformation('second_cc_number');
-        $card->exp_month = str_pad( $payment->getAdditionalInformation('second_cc_exp_month'), 2, '0', STR_PAD_LEFT);
-        $card->exp_year = $payment->getAdditionalInformation('second_cc_exp_year');
-
-        $saveCard = $payment->getAdditionalInformation('second_cc_save');
-        if ($saveCard) {
-            $card->store = true;
-        }
-
-        $holder = new \stdClass();
-        $holder->name = $payment->getAdditionalInformation('second_cc_owner');
-        $card->holder = $holder;
-
-        return $card;
     }
 
     /**
@@ -181,5 +226,31 @@ class TwoCard extends \Magento\Payment\Helper\Data
         }
 
         return $amount;
+    }
+
+    /**
+     * @param $customerTaxvat
+     * @return mixed|string
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getCustomerName($customerTaxvat)
+    {
+        $customerId = $this->payment->getOrder()->getCustomerId();
+        $companyAttributeCode = $this->helperData->getGeneralConfig('company_attribute');
+
+        if ($customerId && strlen($customerTaxvat) == 14) {
+            /** @var \Magento\Customer\Model\Data\Customer $customerData */
+            $customerData = $this->customer->getById($customerId);
+            if ($customerData && $customerData->getId()) {
+                $companyAttribute = $customerData->getCustomAttribute($companyAttributeCode);
+
+                if ($companyAttribute) {
+                    return $companyAttribute->getValue();
+                }
+            }
+        }
+
+        return $this->payment->getOrder()->getCustomerName();
     }
 }

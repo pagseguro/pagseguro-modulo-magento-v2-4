@@ -164,7 +164,7 @@ class TwoCardOrder extends \Magento\Payment\Helper\Data
             $this->helperData->log($secondTransaction);
 
             if (!$secondTransaction)
-                throw new Exception(__('There was an error trying to get second charge information'));
+                throw new \Exception(__('There was an error trying to get second charge information'));
 
             $firstCcSummary = $transaction['amount']['summary'];
             $secondCcSummary = $secondTransaction['amount']['summary'];
@@ -179,7 +179,7 @@ class TwoCardOrder extends \Magento\Payment\Helper\Data
             $secondCcStatus = $secondTransaction['status'];
 
             if (in_array($payment->getMethod(), $this->helperData->getAllowedMethods())) {
-                if ($firstCcStatus == Api::STATUS_PAID && $secondCcStatus == Api::STATUS_PAID) {
+                if ($firstCcStatus === Api::STATUS_PAID && $secondCcStatus === Api::STATUS_PAID) {
                     if ($this->invoiceOrder($order, $payment, Invoice::CAPTURE_OFFLINE)) {
                         $payment->setAdditionalInformation('first_cc_amount_captured', $firstCcAmountPaid);
                         $payment->setAdditionalInformation('second_cc_amount_captured', $secondCcAmountPaid);

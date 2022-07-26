@@ -91,17 +91,19 @@ class TwoCreditCardHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        $transaction = $response['transaction'];
+        $transaction = $response['transaction']['charges'][0];
+
 
         /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment = $paymentData->getPayment();
 
-        if (isset($transaction['status']) && $transaction['status'] == Api::STATUS_DECLINED) {
+        if (isset($transaction['status']) && $transaction['status'] === Api::STATUS_DECLINED) {
             throw new LocalizedException(__('The transaction for first card was not authorized, check your credit card data and try again'));
         }
 
-        if (isset($transaction['status']) && $transaction['status'] != Api::STATUS_CANCELED) {
+        if (isset($transaction['status']) && $transaction['status'] === Api::STATUS_PAID) {
             $secondCcResponse = $this->helperTwoCard->secondCardRequest($payment);
+            $this->api->logRequest(print_r($secondCcResponse, true));
             $secondCcTransaction = $secondCcResponse['transaction'];
             if (
                 isset($secondCcTransaction['error_messages'])

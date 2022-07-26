@@ -109,6 +109,7 @@ class Order extends Action implements \Magento\Framework\App\CsrfAwareActionInte
 
         try {
             $content = $this->getContent($this->getRequest());
+            $content = $content['charges'][0];
             $params = $this->getRequest()->getParams();
 
             $this->logParams($content, $params);

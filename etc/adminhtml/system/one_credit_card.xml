@@ -52,13 +52,6 @@
             <config_path>payment/pagseguropayment_one_cc/can_save_cc</config_path>
         </field>
 
-        <field id="use_encrypted_card" translate="label comment" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-            <label>Use PagSeguro Encrypted Card</label>
-            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <config_path>payment/pagseguropayment_one_cc/use_encrypted_card</config_path>
-            <comment>If enabled will not be possible allow customer save card.</comment>
-        </field>
-
         <field id="order_status" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>New Order Status</label>
             <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>

@@ -38,7 +38,7 @@ class Transaction extends Client
 
         } else {
 
-            $path = $this->getEndpointPath('charge');
+            $path = $this->getEndpointPath('orders');
 
         }
 

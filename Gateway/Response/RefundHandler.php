@@ -44,7 +44,7 @@ class RefundHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        $transaction = $response['transaction'];
+        $transaction = $response['transaction']['charges'][0];
 
         if (isset($transaction['error_messages'])) {
             throw new LocalizedException(__('There was an error with your payment data'));

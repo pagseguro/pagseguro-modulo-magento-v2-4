@@ -25,16 +25,16 @@ interface CardInterface
     /**
      * Constants for keys of data array. Identical to the name of the getter in snake case.
      */
-    const ENTITY_ID = 'entity_id';
-    const CUSTOMER_ID = 'customer_id';
-    const TOKEN = 'token';
-    const CC_TYPE = 'cc_type';
-    const CC_OWNER = 'cc_owner';
-    const CC_LAST4 = 'cc_last4';
-    const CC_EXP_MONTH = 'cc_exp_month';
-    const CC_EXP_YEAR = 'cc_exp_year';
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
+    const ENTITY_ID     = 'entity_id';
+    const CUSTOMER_ID   = 'customer_id';
+    const TOKEN         = 'token';
+    const CC_TYPE       = 'cc_type';
+    const CC_OWNER      = 'cc_owner';
+    const CC_LAST4      = 'cc_last4';
+    const CC_EXP_MONTH  = 'cc_exp_month';
+    const CC_EXP_YEAR   = 'cc_exp_year';
+    const CREATED_AT    = 'created_at';
+    const UPDATED_AT    = 'updated_at';
 
     /**
      * Get EntityId.

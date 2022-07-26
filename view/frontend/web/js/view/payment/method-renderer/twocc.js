@@ -217,12 +217,11 @@ define([
              * @returns {Object}
              */
             getData: function () {
-                let firstCcCid = !this.canEncrypt() ? this.firstCreditCardVerificationNumber() : null;
-                let secondCcCid = !this.canEncrypt() ? this.secondCreditCardVerificationNumber() : null;
+
                 return {
                     'method': this.item.method,
                     'additional_data': {
-                        'cc_one_cc_cid': firstCcCid,
+                        'cc_one_cc_cid': this.firstCreditCardVerificationNumber(),
                         'cc_one_cc_type': this.firstCreditCardType(),
                         'cc_one_cc_exp_year': this.firstCreditCardExpYear(),
                         'cc_one_cc_exp_month': this.firstCreditCardExpMonth(),
@@ -234,7 +233,7 @@ define([
                         'cc_one_cc_encrypted': this.firstCreditCardEncrypted,
                         'cc_one_cc_amount': this.firstCreditCardAmount(),
 
-                        'cc_two_cc_cid': secondCcCid,
+                        'cc_two_cc_cid': this.secondCreditCardVerificationNumber(),
                         'cc_two_cc_type': this.secondCreditCardType(),
                         'cc_two_cc_exp_year': this.secondCreditCardExpYear(),
                         'cc_two_cc_exp_month': this.secondCreditCardExpMonth(),
@@ -264,7 +263,7 @@ define([
             validate: function () {
                 const $form = $('#' + 'form_' + this.getCode());
 
-                if (($form.validation() && $form.validation('isValid')) && this.canEncrypt()) {
+                if (($form.validation() && $form.validation('isValid'))) {
                     this.encryptCard();
                 }
 

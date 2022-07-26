@@ -156,17 +156,80 @@ class TransactionRequest implements BuilderInterface
 
         $request = new \stdClass();
         $request->reference_id = $this->getOrder()->getIncrementId();
-        $request->description = __(sprintf("Online Purchase - #%s", $this->getOrder()->getIncrementId()));
-        $request->amount = $this->getChargeAmount($amount);
+        $request->customer = $this->getCustomerData();
+        $request->items = $this->getItemsData($amount);
         $request->notification_urls = [
             $this->helper->getUrlBuilder()->getUrl('pagseguropayment/notification/orders')
         ];
 
-        // Payment Method Data
-        $request = $this->getPaymentData($request, $payment);
+        $request->charges = [$this->getChargeData($request, $payment, $amount)];
 
         return ['request' => $request];
     }
+
+    /**
+     * @return \stdClass
+     */
+    protected function getCustomerData()
+    {
+        $taxvat = $this->getOrder()->getCustomerTaxvat() ?? $this->getCustomerTaxvat();
+        $customer = new \stdClass();
+        $customer->tax_id = $this->helper->digits($taxvat);
+        $customer->name = $this->getCustomerName($customer->tax_id);
+        $customer->email = $this->getOrder()->getCustomerEmail();
+        return $customer;
+    }
+
+    /**
+     * @return \stdClass
+     */
+    protected function getItemsData($amount)
+    {
+        $items = new \stdClass();
+        $items->name = __(sprintf("Online Purchase - #%s", $this->getOrder()->getIncrementId()));;
+        $items->quantity = 1;
+        $items->unit_amount = str_replace('.', '', $amount);
+        return [$items];
+    }
+
+    /**
+     * @return string|null
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getCustomerTaxvat()
+    {
+        $customer = false;
+        if ($customerId = $this->getOrder()->getCustomerId()) {
+            $customer = $this->customer->getById($customerId);
+            $customerTaxvat = $customer ? $customer->getTaxvat() : null;
+        }
+        return $customerTaxvat ?? $this->getOrder()->getBillingAddress()->getVatId();
+    }
+
+    /**
+     * @param \stdClass $request
+     * @param \Magento\Sales\Model\Order\Payment\Interceptor $payment
+     * @param float $amount
+     * @param string $buyerId
+     *
+     * @return \stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function getChargeData($request, $payment, $amount)
+    {
+        $charge = new \stdClass();
+        $charge->reference_id = $this->getOrder()->getIncrementId();
+        $charge->description = __(sprintf("Online Purchase - #%s", $this->getOrder()->getIncrementId()));
+        $charge->amount = $this->getChargeAmount($amount);
+        // Payment Method Data
+        $charge->payment_method = $this->getPaymentData($request, $payment, $amount);
+        $charge->notification_urls = [
+            $this->helper->getUrlBuilder()->getUrl('pagseguropayment/notification/order')
+        ];
+        return $charge;
+    }
+
 
     /**
      * @param \stdClass $request
@@ -186,8 +249,7 @@ class TransactionRequest implements BuilderInterface
         $paymentMethod->capture = $this->helper->getConfig('payment_action', $method) == MethodInterface::ACTION_AUTHORIZE ? false : true;
         $paymentMethod->card = $this->getCardData($request, $payment);
 
-        $request->payment_method = $paymentMethod;
-        return $request;
+        return $paymentMethod;
     }
 
     /**
@@ -206,28 +268,6 @@ class TransactionRequest implements BuilderInterface
             $card->encrypted = $encrypted;
             return $card;
         }
-
-        $card->security_code = $payment->getCcCid();
-
-        if ($token = $payment->getAdditionalInformation('first_cc_id')) {
-            $card->id = $token;
-            return $card;
-        }
-
-        $card->number = $payment->getCcNumber();
-        $card->exp_month = str_pad($payment->getCcExpMonth(), 2, '0', STR_PAD_LEFT);
-        $card->exp_year = $payment->getCcExpYear();
-
-        $saveCard = $payment->getAdditionalInformation('first_cc_save');
-        if ($saveCard) {
-            $card->store = true;
-        }
-
-        $holder = new \stdClass();
-        $holder->name = $payment->getCcOwner();
-        $card->holder = $holder;
-
-        return $card;
     }
 
     /**
@@ -264,5 +304,31 @@ class TransactionRequest implements BuilderInterface
         }
 
         return $amount;
+    }
+
+    /**
+     * @param $customerTaxvat
+     * @return mixed|string
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getCustomerName($customerTaxvat)
+    {
+        $customerId = $this->getOrder()->getCustomerId();
+        $companyAttributeCode = $this->helper->getGeneralConfig('company_attribute');
+
+        if ($customerId && strlen($customerTaxvat) == 14) {
+            /** @var \Magento\Customer\Model\Data\Customer $customerData */
+            $customerData = $this->customer->getById($customerId);
+            if ($customerData && $customerData->getId()) {
+                $companyAttribute = $customerData->getCustomAttribute($companyAttributeCode);
+
+                if ($companyAttribute) {
+                    return $companyAttribute->getValue();
+                }
+            }
+        }
+
+        return $this->getOrder()->getCustomerName();
     }
 }

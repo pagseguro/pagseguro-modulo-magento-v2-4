@@ -76,27 +76,6 @@ class TwoCreditCard extends AbstractInfo
         $firstCcInstallmentValue = $firstCcAmount / $installments;
         $secondCcInstallmentValue = $secondCcAmount / $secondCcInstallments;
 
-        if ($firstCcSaved = $this->getInfo()->getAdditionalInformation('first_cc_id')) {
-            /** @var \Magento\Sales\Model\Order $order */
-            $order = $this->getInfo()->getOrder();
-
-            $cardInfo = $this->getSavedCardInfo($firstCcSaved, $order->getCustomerId());
-            if ($cardInfo->getId()) {
-                $this->getInfo()->setCcLast4($cardInfo->getCcLast4());
-                $this->getInfo()->setCcType($cardInfo->getCcType());
-            }
-        }
-
-        if ($secondCcSaved = $this->getInfo()->getAdditionalInformation('second_cc_id')) {
-            /** @var \Magento\Sales\Model\Order $order */
-            $order = $this->getInfo()->getOrder();
-
-            $cardInfo = $this->getSavedCardInfo($secondCcSaved, $order->getCustomerId());
-            if ($cardInfo->getId()) {
-                $this->getInfo()->setAdditionalInformation('second_cc_last4', $cardInfo->getCcLast4());
-            }
-        }
-
         $body = [
             (string)__('First TID') => $this->getInfo()->getAdditionalInformation('id'),
             (string)__('First Credit Card Type') => $this->getCcTypeName(),
@@ -136,20 +115,5 @@ class TwoCreditCard extends AbstractInfo
             return $types[$ccType];
         }
         return empty($ccType) ? __('N/A') : __(ucwords($ccType));
-    }
-
-    /**
-     * @param $cardId
-     * @param $customerId
-     * @return null
-     */
-    private function getSavedCardInfo($cardId, $customerId)
-    {
-        $cardInfo = null;
-        if ($cardId) {
-            $cardInfo = $this->helperCard->getCardByToken($cardId, $customerId);
-        }
-
-        return $cardInfo;
     }
 }

@@ -126,8 +126,6 @@ class ConfigProvider extends CcGenericConfigProvider
         $grandTotal = $this->checkoutSession->getQuote()->getGrandTotal();
         $methodCode = self::CODE;
 
-        $canEncrypt = $this->helper->getConfig('use_encrypted_card', $methodCode);
-
         return [
             'payment' => [
                 'ccform' => [
@@ -137,8 +135,8 @@ class ConfigProvider extends CcGenericConfigProvider
                     'years' => [$methodCode => $this->getCcYears()],
                     'hasVerification' => [$methodCode => $this->hasVerification($methodCode)],
                     'cvvImageUrl' => [$methodCode => $this->getCvvImageUrl()],
-                    'canSave' => [$methodCode => !$canEncrypt ? (bool)$this->helper->getConfig('can_save_cc', $methodCode) : false],
-                    'canEncrypt' => [$methodCode => (bool)$canEncrypt],
+                    'canSave' => [$methodCode => false],
+                    'canEncrypt' => true,
                     'publicKey' => [$methodCode => $this->helper->getGeneralConfig('public_key')],
                     'minInstallment' => [$methodCode => $this->helper->getConfig('minimum_installment_amount', $methodCode)],
                     'urls' => [

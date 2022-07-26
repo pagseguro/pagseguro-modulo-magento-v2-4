@@ -45,7 +45,7 @@ class TicketHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        $transaction = $response['transaction'];
+        $transaction = $response['transaction']['charges'][0];
 
         /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment = $paymentData->getPayment();
@@ -64,7 +64,7 @@ class TicketHandler implements HandlerInterface
             }
 
             if (isset($transaction['payment_method']['boleto']['barcode'])) {
-                $payment->setAdditionalInformation('barcode', $transaction['payment_method']['boleto']['barcode']);
+                $payment->setAdditionalInformation('barcode', $transaction['payment_method']['boleto']['formatted_barcode']);
             }
 
             if (isset($transaction['payment_method']['boleto']['due_date'])) {

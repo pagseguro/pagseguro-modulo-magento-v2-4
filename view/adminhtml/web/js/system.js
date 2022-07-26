@@ -24,8 +24,6 @@ require(['jquery', 'Magento_Ui/js/modal/alert', 'mage/translate'], function ($, 
 
         redirectUrl = redirectUrl + '&redirect_uri=' + window.location.href + '?code_verifier=' + codeVerifier
 
-        console.log(redirectUrl)
-
         window.open(redirectUrl, '_blank').focus();
 
     }
