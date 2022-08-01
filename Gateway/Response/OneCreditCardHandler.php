@@ -61,7 +61,7 @@ class OneCreditCardHandler implements HandlerInterface
         /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment = $paymentData->getPayment();
 
-        if (isset($transaction['status']) && $transaction['status'] == Api::STATUS_DECLINED) {
+        if (isset($transaction['status']) && $transaction['status'] === Api::STATUS_DECLINED) {
             throw new LocalizedException(__('The transaction was not authorized, check your credit card data and try again'));
         }
 
