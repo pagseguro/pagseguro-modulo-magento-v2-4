@@ -49,13 +49,13 @@
 
         <field id="order_status" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>New Order Status</label>
-            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
             <config_path>payment/pagseguropayment_pix/order_status</config_path>
         </field>
 
         <field id="paid_order_status" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
             <label>Paid Order Status</label>
-            <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+            <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
             <config_path>payment/pagseguropayment_pix/paid_order_status</config_path>
         </field>
 
