@@ -305,6 +305,7 @@
                     </div>
                     <!-- /ko -->
 
+                    <!-- ko if: (canEncrypt())-->
                     <div class="field cards" data-bind="attr: {id: getCode() + '_card_two_encrypted'}, visible: false" >
                         <div class="control">
                             <input type="hidden"
@@ -314,6 +315,7 @@
                                    data-bind="attr: {id: getCode() + '_card_two_cc_encrypted', 'data-container': getCode() + '-cc-encrypted'}, value: secondCreditCardEncrypted">
                         </div>
                     </div>
+                    <!-- /ko -->
 
                     <div class="field number cc-number required" data-bind="visible: showSecondCardData">
                         <div class="credit-card-types-container">

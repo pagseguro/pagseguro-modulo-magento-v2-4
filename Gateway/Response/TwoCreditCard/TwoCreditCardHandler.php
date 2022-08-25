@@ -91,24 +91,32 @@ class TwoCreditCardHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        $transaction = $response['transaction']['charges'][0];
-
+        if (isset($response['transaction']['charges'])) {
+            $transaction = $response['transaction']['charges'][0];
+        } else {
+            $transaction = $response['transaction'];
+        }
 
         /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment = $paymentData->getPayment();
-
-        if (isset($transaction['status']) && $transaction['status'] === Api::STATUS_DECLINED) {
-            throw new LocalizedException(__('The transaction for first card was not authorized, check your credit card data and try again'));
+        $this->api->logRequest($payment);
+        if (isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID) {
+            $message = $transaction['payment_response']['message'];
+            throw new LocalizedException(__($message));
         }
 
         if (isset($transaction['status']) && $transaction['status'] === Api::STATUS_PAID) {
             $secondCcResponse = $this->helperTwoCard->secondCardRequest($payment);
-            $this->api->logRequest(print_r($secondCcResponse, true));
-            $secondCcTransaction = $secondCcResponse['transaction'];
+
+            if (isset($secondCcResponse['transaction']['charges'])) {
+                $secondCcTransaction = $secondCcResponse['transaction']['charges'][0];
+            } else {
+                $secondCcTransaction = $secondCcResponse['transaction'];
+            }
             if (
                 isset($secondCcTransaction['error_messages'])
                 || isset($secondCcTransaction['status'])
-                && $secondCcTransaction['status'] == Api::STATUS_DECLINED
+                && $secondCcTransaction['status'] === Api::STATUS_DECLINED
             ) {
                 $canceledTransaction = $this->api->transaction()->cancelCharge(
                     $transaction['id'],

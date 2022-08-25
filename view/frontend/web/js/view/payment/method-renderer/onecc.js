@@ -175,7 +175,8 @@ function (
         validate: function () {
             const $form = $('#' + 'form_' + this.getCode());
 
-            if (($form.validation() && $form.validation('isValid')) && this.canEncrypt()) {
+            if (($form.validation() && $form.validation('isValid'))) {
+                console.log('validate');
                 this.encryptCard();
             }
 
@@ -278,14 +279,16 @@ function (
 
         encryptCard: function () {
             let pagseguroEncrypt = PagSeguro.encryptCard({
-                publicKey: window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
+                publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB',  //window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
                 holder: this.creditCardOwner(),
                 number: this.pagseguroPaymentCreditCardNumber(),
                 expMonth: this.creditCardExpMonth(),
                 expYear: this.creditCardExpYear(),
                 securityCode: this.creditCardVerificationNumber()
             });
+            console.log(pagseguroEncrypt)
             this.creditCardEncrypted = pagseguroEncrypt.encryptedCard;
+            console.log(this.creditCardEncrypted)
         },
     });
 }

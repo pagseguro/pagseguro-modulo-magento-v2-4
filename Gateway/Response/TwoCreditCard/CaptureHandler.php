@@ -45,7 +45,11 @@ class CaptureHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        $transaction = $response['transaction'];
+        if (isset($response['transaction']['charges'])) {
+            $transaction = $response['transaction']['charges'][0];
+        } else {
+            $transaction = $response['transaction'];
+        }
 
         if (isset($transaction['first_cc']['error_messages']) || isset($transaction['second_cc']['error_messages'])) {
             throw new LocalizedException(__('There was an error with your payment data'));
@@ -56,8 +60,8 @@ class CaptureHandler implements HandlerInterface
 
         $status = Api::STATUS_AUTHORIZED;
         if (
-            $transaction['first_cc']['status'] == Api::STATUS_PAID
-            && $transaction['first_cc']['status'] == $transaction['second_cc']['status']
+            $transaction['first_cc']['status'] === Api::STATUS_PAID
+            && $transaction['first_cc']['status'] === $transaction['second_cc']['status']
         ) {
             $status = Api::STATUS_PAID;
         }
@@ -66,7 +70,7 @@ class CaptureHandler implements HandlerInterface
         $payment->setAdditionalInformation('status', $status);
         foreach ($transaction as $key => $charge) {
             if (isset($charge['status'])) {
-                if ($charge['status'] == Api::STATUS_PAID) {
+                if ($charge['status'] === Api::STATUS_PAID) {
                     $payment->setAdditionalInformation($key . '_status', $charge['status']);
                     $payment->setAdditionalInformation($key . '_captured', true);
                     $payment->setAdditionalInformation($key . '_captured_amount', $charge['amount']['summary']['paid']);

@@ -32,7 +32,7 @@
                 <oauth_url>https://connect.pagseguro.uol.com.br/oauth2/authorize</oauth_url>
                 <oauth_sandbox_url>https://connect.sandbox.pagseguro.uol.com.br/oauth2/authorize</oauth_sandbox_url>
                 <refund_on_cancel>1</refund_on_cancel>
-                <show_payment_info>1</show_payment_info>
+                <show_payment_info>0</show_payment_info>
             </general>
 
             <endpoints>
@@ -106,7 +106,7 @@
                 <active>0</active>
                 <model>PagSeguroPaymentOneCreditCardFacade</model>
                 <title>PagSeguro - Cartão de Crédito</title>
-                <payment_action>authorize_capture</payment_action>
+                <payment_action>authorize</payment_action>
                 <order_status>processing</order_status>
                 <has_interest>0</has_interest>
                 <cctypes>MC,VI</cctypes>
@@ -154,7 +154,7 @@
                 <active>0</active>
                 <model>PagSeguroPaymentTwoCreditCardFacade</model>
                 <title>PagSeguro - Pagamento com Dois Cartões</title>
-                <payment_action>authorize_capture</payment_action>
+                <payment_action>authorize</payment_action>
                 <order_status>processing</order_status>
                 <has_interest>0</has_interest>
                 <cctypes>MC,VI</cctypes>

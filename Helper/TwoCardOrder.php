@@ -160,9 +160,6 @@ class TwoCardOrder extends \Magento\Payment\Helper\Data
             $currentFirstCcStatus = $payment->getAdditionalInformation('first_cc_status');
             $currentSecondCcStatus = $payment->getAdditionalInformation('second_cc_status');
 
-            $this->helperData->log($transaction);
-            $this->helperData->log($secondTransaction);
-
             if (!$secondTransaction)
                 throw new \Exception(__('There was an error trying to get second charge information'));
 
@@ -180,13 +177,16 @@ class TwoCardOrder extends \Magento\Payment\Helper\Data
 
             if (in_array($payment->getMethod(), $this->helperData->getAllowedMethods())) {
                 if ($firstCcStatus === Api::STATUS_PAID && $secondCcStatus === Api::STATUS_PAID) {
+
                     if ($this->invoiceOrder($order, $payment, Invoice::CAPTURE_OFFLINE)) {
+
                         $payment->setAdditionalInformation('first_cc_amount_captured', $firstCcAmountPaid);
                         $payment->setAdditionalInformation('second_cc_amount_captured', $secondCcAmountPaid);
                         $payment->setAdditionalInformation('amount_captured', $firstCcAmountPaid + $secondCcAmountPaid);
                         $order->addCommentToStatusHistory(sprintf(__('Charge %s - STATUS: %s'), $transaction['id'], $firstCcStatus));
                         $order->addCommentToStatusHistory(sprintf(__('Charge %s - STATUS: %s'), $secondTransaction['id'], $secondCcStatus));
                     }
+
                 } else if (in_array($firstCcStatus, $this->api->deniedStatuses()) || in_array($secondCcStatus, $this->api->deniedStatuses())) {
                     $this->cancelOrder($order, $payment);
                     $payment->setAdditionalInformation('first_cc_amount_refunded', $firstCcRefundedAmount);

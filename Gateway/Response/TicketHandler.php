@@ -64,7 +64,7 @@ class TicketHandler implements HandlerInterface
             }
 
             if (isset($transaction['payment_method']['boleto']['barcode'])) {
-                $payment->setAdditionalInformation('barcode', $transaction['payment_method']['boleto']['formatted_barcode']);
+                $payment->setAdditionalInformation('barcode', $transaction['payment_method']['boleto']['barcode']);
             }
 
             if (isset($transaction['payment_method']['boleto']['due_date'])) {

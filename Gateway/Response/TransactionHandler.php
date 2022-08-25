@@ -71,7 +71,11 @@ class TransactionHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        $transaction = $response['transaction'];
+        if (isset($response['transaction']['charges'])) {
+            $transaction = $response['transaction']['charges'][0];
+        } else {
+            $transaction = $response['transaction'];
+        }
 
         if (isset($transaction['status']) || isset($transaction['error_messages'])) {
 

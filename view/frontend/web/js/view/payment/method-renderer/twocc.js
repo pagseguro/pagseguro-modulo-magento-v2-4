@@ -20,459 +20,459 @@
 /*global define*/
 
 define([
-        'underscore',
-        'ko',
-        'jquery',
-        'mage/translate',
-        'Magento_SalesRule/js/action/set-coupon-code',
-        'Magento_SalesRule/js/action/cancel-coupon',
-        'Magento_Customer/js/model/customer',
-        'Magento_Payment/js/view/payment/cc-form',
-        'PagSeguro_Payment/js/model/credit-card-validation/credit-card-number-validator',
-        'Magento_Payment/js/model/credit-card-validation/credit-card-data',
-        'Magento_Checkout/js/model/quote',
-        'Magento_Checkout/js/model/cart/totals-processor/default',
-        'Magento_Checkout/js/model/cart/cache',
-        'Magento_Payment/js/model/credit-card-validation/validator',
-        'Magento_Checkout/js/model/payment/additional-validators',
-        'mage/mage',
-        'mage/validation',
-        'pagseguropayment/validation'
-    ],
-    function (
-        _,
-        ko,
-        $,
-        $t,
-        setCouponCodeAction,
-        cancelCouponCodeAction,
-        customer,
-        Component,
-        cardNumberValidator,
-        creditCardData,
-        quote,
-        defaultTotal,
-        cartCache
-    ) {
-        'use strict';
+    'underscore',
+    'ko',
+    'jquery',
+    'mage/translate',
+    'Magento_SalesRule/js/action/set-coupon-code',
+    'Magento_SalesRule/js/action/cancel-coupon',
+    'Magento_Customer/js/model/customer',
+    'Magento_Payment/js/view/payment/cc-form',
+    'PagSeguro_Payment/js/model/credit-card-validation/credit-card-number-validator',
+    'Magento_Payment/js/model/credit-card-validation/credit-card-data',
+    'Magento_Checkout/js/model/quote',
+    'Magento_Checkout/js/model/cart/totals-processor/default',
+    'Magento_Checkout/js/model/cart/cache',
+    'Magento_Payment/js/model/credit-card-validation/validator',
+    'Magento_Checkout/js/model/payment/additional-validators',
+    'mage/mage',
+    'mage/validation',
+    'pagseguropayment/validation'
+],
+function (
+    _,
+    ko,
+    $,
+    $t,
+    setCouponCodeAction,
+    cancelCouponCodeAction,
+    customer,
+    Component,
+    cardNumberValidator,
+    creditCardData,
+    quote,
+    defaultTotal,
+    cartCache
+) {
+    'use strict';
 
-        return Component.extend({
-            defaults: {
-                template: 'PagSeguro_Payment/payment/form/twocc',
-                firstCreditCardAmount: 0,
-                firstCreditCardOwner: '',
-                firstCreditCardSave: '',
-                firstCreditCardId: '',
-                firstCreditCardInstallments: '',
-                firstCreditCardEncrypted: '',
-                pagseguroPaymentFirstCreditCardNumber: '',
-                showFirstCardData: ko.observable(true),
-                hasCards: ko.observable(false),
-                firstCards: ko.observableArray([]),
+    return Component.extend({
+        defaults: {
+            template: 'PagSeguro_Payment/payment/form/twocc',
+            firstCreditCardAmount: 0,
+            firstCreditCardOwner: '',
+            firstCreditCardSave: '',
+            firstCreditCardId: '',
+            firstCreditCardInstallments: '',
+            firstCreditCardEncrypted: '',
+            pagseguroPaymentFirstCreditCardNumber: '',
+            showFirstCardData: ko.observable(true),
+            hasCards: ko.observable(false),
+            firstCards: ko.observableArray([]),
 
-                cardOneInstallments: ko.observableArray(['']),
-                cardOneHasInstallments: ko.observable(false),
+            cardOneInstallments: ko.observableArray(['']),
+            cardOneHasInstallments: ko.observable(false),
 
-                cardTwoInstallments: ko.observableArray([]),
-                cardTwoHasInstallments: ko.observable(false),
+            cardTwoInstallments: ko.observableArray([]),
+            cardTwoHasInstallments: ko.observable(false),
 
-                installmentsUrl: '',
-                cardsUrl: '',
-                showLoadingInstallment: ko.observable(false),
+            installmentsUrl: '',
+            cardsUrl: '',
+            showLoadingInstallment: ko.observable(false),
 
-                secondCreditCardAmount: 0,
-                secondCreditCardOwner: '',
-                secondCreditCardSave: '',
-                secondCreditCardId: '',
-                secondCreditCardInstallments: '',
-                pagseguroPaymentSecondCreditCardNumber: '',
-                secondCreditCardEncrypted: '',
-                showSecondCardData: ko.observable(true),
-                secondCards: ko.observableArray([]),
-            },
+            secondCreditCardAmount: 0,
+            secondCreditCardOwner: '',
+            secondCreditCardSave: '',
+            secondCreditCardId: '',
+            secondCreditCardInstallments: '',
+            pagseguroPaymentSecondCreditCardNumber: '',
+            secondCreditCardEncrypted: '',
+            showSecondCardData: ko.observable(true),
+            secondCards: ko.observableArray([]),
+        },
 
-            /** @inheritdoc */
-            initObservable: function () {
-                var self = this;
+        /** @inheritdoc */
+        initObservable: function () {
+            var self = this;
 
-                cartCache.set('totals',null);
-                defaultTotal.estimateTotals();
+            cartCache.set('totals',null);
+            defaultTotal.estimateTotals();
 
-                this._super()
-                    .observe([
-                        'firstCreditCardAmount',
-                        'firstCreditCardType',
-                        'firstCreditCardExpYear',
-                        'firstCreditCardExpMonth',
-                        'pagseguroPaymentFirstCreditCardNumber',
-                        'firstCreditCardVerificationNumber',
-                        'firstSelectedCardType',
-                        'firstCreditCardOwner',
-                        'firstCreditCardSave',
-                        'firstCreditCardId',
-                        'firstCreditCardInstallments',
-                        'firstCreditCardEncrypted',
+            this._super()
+                .observe([
+                    'firstCreditCardAmount',
+                    'firstCreditCardType',
+                    'firstCreditCardExpYear',
+                    'firstCreditCardExpMonth',
+                    'pagseguroPaymentFirstCreditCardNumber',
+                    'firstCreditCardVerificationNumber',
+                    'firstSelectedCardType',
+                    'firstCreditCardOwner',
+                    'firstCreditCardSave',
+                    'firstCreditCardId',
+                    'firstCreditCardInstallments',
+                    'firstCreditCardEncrypted',
 
-                        'secondSelectedCardType',
-                        'secondCreditCardAmount',
-                        'secondCreditCardType',
-                        'secondCreditCardExpYear',
-                        'secondCreditCardExpMonth',
-                        'pagseguroPaymentSecondCreditCardNumber',
-                        'secondCreditCardVerificationNumber',
-                        'secondCreditCardOwner',
-                        'secondCreditCardSave',
-                        'secondCreditCardId',
-                        'secondCreditCardInstallments',
-                        'secondCreditCardEncrypted'
-                    ]);
+                    'secondSelectedCardType',
+                    'secondCreditCardAmount',
+                    'secondCreditCardType',
+                    'secondCreditCardExpYear',
+                    'secondCreditCardExpMonth',
+                    'pagseguroPaymentSecondCreditCardNumber',
+                    'secondCreditCardVerificationNumber',
+                    'secondCreditCardOwner',
+                    'secondCreditCardSave',
+                    'secondCreditCardId',
+                    'secondCreditCardInstallments',
+                    'secondCreditCardEncrypted'
+                ]);
 
-                this.firstCreditCardId.subscribe(function (value) {
-                    if (typeof value === "undefined" || value === "") {
-                        self.showFirstCardData(true);
-                    } else {
-                        self.showFirstCardData(false);
-                    }
-                });
+            this.firstCreditCardId.subscribe(function (value) {
+                if (typeof value === "undefined" || value === "") {
+                    self.showFirstCardData(true);
+                } else {
+                    self.showFirstCardData(false);
+                }
+            });
 
-                this.secondCreditCardId.subscribe(function (value) {
-                    if (typeof value === "undefined" || value === "") {
-                        self.showSecondCardData(true);
-                    } else {
-                        self.showSecondCardData(false);
-                    }
-                });
+            this.secondCreditCardId.subscribe(function (value) {
+                if (typeof value === "undefined" || value === "") {
+                    self.showSecondCardData(true);
+                } else {
+                    self.showSecondCardData(false);
+                }
+            });
 
-                this.firstCreditCardAmount.subscribe(function (value) {
-                    self.updateTwoCardAmount(value, 'card_one')
-                });
+            this.firstCreditCardAmount.subscribe(function (value) {
+                self.updateTwoCardAmount(value, 'card_one')
+            });
 
-                this.secondCreditCardAmount.subscribe(function (value) {
-                    self.updateTwoCardAmount(value, 'card_two')
-                });
+            this.secondCreditCardAmount.subscribe(function (value) {
+                self.updateTwoCardAmount(value, 'card_two')
+            });
 
-                //Set credit card number to credit card data object
-                this.pagseguroPaymentFirstCreditCardNumber.subscribe(function (value) {
-                    var result;
+            //Set credit card number to credit card data object
+            this.pagseguroPaymentFirstCreditCardNumber.subscribe(function (value) {
+                var result;
 
-                    self.firstSelectedCardType(null);
+                self.firstSelectedCardType(null);
 
-                    if (value === '' || value === null) {
-                        return false;
-                    }
-                    result = cardNumberValidator(value);
+                if (value === '' || value === null) {
+                    return false;
+                }
+                result = cardNumberValidator(value);
 
-                    if (!result.isPotentiallyValid && !result.isValid) {
-                        return false;
-                    }
-
-                    if (result.card !== null) {
-                        self.firstSelectedCardType(result.card.type);
-                        creditCardData.creditCard = result.card;
-                    }
-
-                    if (result.isValid) {
-                        creditCardData.pagseguroPaymentFirstCreditCardNumber = value;
-                        self.firstCreditCardType(result.card.type);
-                    }
-                });
-
-                //Set credit card number to credit card data object
-                this.pagseguroPaymentSecondCreditCardNumber.subscribe(function (value) {
-                    var result;
-
-                    self.secondSelectedCardType(null);
-
-                    if (value === '' || value === null) {
-                        return false;
-                    }
-                    result = cardNumberValidator(value);
-
-                    if (!result.isPotentiallyValid && !result.isValid) {
-                        return false;
-                    }
-
-                    if (result.card !== null) {
-                        self.secondSelectedCardType(result.card.type);
-                        creditCardData.creditCard = result.card;
-                    }
-
-                    if (result.isValid) {
-                        creditCardData.pagseguroPaymentSecondCreditCardNumber = value;
-                        self.secondCreditCardType(result.card.type);
-                    }
-                });
-
-                this.updateCardsValues();
-
-                return this;
-            },
-
-            getCode: function() {
-                return this.item.method;
-            },
-
-            /**
-             * Get data
-             * @returns {Object}
-             */
-            getData: function () {
-
-                return {
-                    'method': this.item.method,
-                    'additional_data': {
-                        'cc_one_cc_cid': this.firstCreditCardVerificationNumber(),
-                        'cc_one_cc_type': this.firstCreditCardType(),
-                        'cc_one_cc_exp_year': this.firstCreditCardExpYear(),
-                        'cc_one_cc_exp_month': this.firstCreditCardExpMonth(),
-                        'cc_one_cc_number': this.pagseguroPaymentFirstCreditCardNumber(),
-                        'cc_one_cc_owner': this.firstCreditCardOwner(),
-                        'cc_one_cc_save': this.firstCreditCardSave(),
-                        'cc_one_cc_id': this.firstCreditCardId(),
-                        'cc_one_installments': this.firstCreditCardInstallments(),
-                        'cc_one_cc_encrypted': this.firstCreditCardEncrypted,
-                        'cc_one_cc_amount': this.firstCreditCardAmount(),
-
-                        'cc_two_cc_cid': this.secondCreditCardVerificationNumber(),
-                        'cc_two_cc_type': this.secondCreditCardType(),
-                        'cc_two_cc_exp_year': this.secondCreditCardExpYear(),
-                        'cc_two_cc_exp_month': this.secondCreditCardExpMonth(),
-                        'cc_two_cc_number': this.pagseguroPaymentSecondCreditCardNumber(),
-                        'cc_two_cc_owner': this.secondCreditCardOwner(),
-                        'cc_two_cc_save': this.secondCreditCardSave(),
-                        'cc_two_cc_id': this.secondCreditCardId(),
-                        'cc_two_installments': this.secondCreditCardInstallments(),
-                        'cc_two_cc_encrypted': this.secondCreditCardEncrypted,
-                        'cc_two_cc_amount': this.secondCreditCardAmount()
-                    }
-                };
-            },
-
-            /**
-             * Check if payment is active
-             *
-             * @returns {Boolean}
-             */
-            isActive: function() {
-                return this.getCode() === this.isChecked();
-            },
-
-            /**
-             * @return {Boolean}
-             */
-            validate: function () {
-                const $form = $('#' + 'form_' + this.getCode());
-
-                if (($form.validation() && $form.validation('isValid'))) {
-                    this.encryptCard();
+                if (!result.isPotentiallyValid && !result.isValid) {
+                    return false;
                 }
 
-                return ($form.validation() && $form.validation('isValid'));
-            },
-
-            /**
-             * @returns {boolean|*}
-             */
-            retrieveInstallmentsUrl: function() {
-                try {
-                    this.installmentsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments;
-                    return this.installmentsUrl;
-                } catch (e) {
-                    console.log('Installments URL not defined');
+                if (result.card !== null) {
+                    self.firstSelectedCardType(result.card.type);
+                    creditCardData.creditCard = result.card;
                 }
-                return false;
-            },
 
-            /**
-             * @returns {boolean|*}
-             */
-            retrieveCardsUrl: function() {
-                try {
-                    this.cardsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].cards;
-                    return this.cardsUrl;
-                } catch (e) {
-                    console.log('Cards URL not defined');
+                if (result.isValid) {
+                    creditCardData.pagseguroPaymentFirstCreditCardNumber = value;
+                    self.firstCreditCardType(result.card.type);
                 }
-                return false;
-            },
+            });
 
-            updateCardsValues: function() {
-                var self = this;
-                self.firstCards.removeAll();
-                self.secondCards.removeAll();
-                new Promise((resolve) => {
-                    fetch(self.retrieveCardsUrl(), {
-                        method: 'GET',
-                        cache: 'no-cache',
-                        headers: {'Content-Type': 'application/json'}
-                    }).then((response) => {
-                        return response.json();
-                    }).then(json => {
-                        json.forEach(function(card) {
-                            self.firstCards.push(card);
-                            self.secondCards.push(card);
-                            self.hasCards(true);
-                        });
+            //Set credit card number to credit card data object
+            this.pagseguroPaymentSecondCreditCardNumber.subscribe(function (value) {
+                var result;
+
+                self.secondSelectedCardType(null);
+
+                if (value === '' || value === null) {
+                    return false;
+                }
+                result = cardNumberValidator(value);
+
+                if (!result.isPotentiallyValid && !result.isValid) {
+                    return false;
+                }
+
+                if (result.card !== null) {
+                    self.secondSelectedCardType(result.card.type);
+                    creditCardData.creditCard = result.card;
+                }
+
+                if (result.isValid) {
+                    creditCardData.pagseguroPaymentSecondCreditCardNumber = value;
+                    self.secondCreditCardType(result.card.type);
+                }
+            });
+
+            this.updateCardsValues();
+
+            return this;
+        },
+
+        getCode: function() {
+            return this.item.method;
+        },
+
+        /**
+         * Get data
+         * @returns {Object}
+         */
+        getData: function () {
+
+            return {
+                'method': this.item.method,
+                'additional_data': {
+                    'cc_one_cc_cid': this.firstCreditCardVerificationNumber(),
+                    'cc_one_cc_type': this.firstCreditCardType(),
+                    'cc_one_cc_exp_year': this.firstCreditCardExpYear(),
+                    'cc_one_cc_exp_month': this.firstCreditCardExpMonth(),
+                    'cc_one_cc_number': this.pagseguroPaymentFirstCreditCardNumber(),
+                    'cc_one_cc_owner': this.firstCreditCardOwner(),
+                    'cc_one_cc_save': this.firstCreditCardSave(),
+                    'cc_one_cc_id': this.firstCreditCardId(),
+                    'cc_one_installments': this.firstCreditCardInstallments(),
+                    'cc_one_cc_encrypted': this.firstCreditCardEncrypted,
+                    'cc_one_cc_amount': this.firstCreditCardAmount(),
+
+                    'cc_two_cc_cid': this.secondCreditCardVerificationNumber(),
+                    'cc_two_cc_type': this.secondCreditCardType(),
+                    'cc_two_cc_exp_year': this.secondCreditCardExpYear(),
+                    'cc_two_cc_exp_month': this.secondCreditCardExpMonth(),
+                    'cc_two_cc_number': this.pagseguroPaymentSecondCreditCardNumber(),
+                    'cc_two_cc_owner': this.secondCreditCardOwner(),
+                    'cc_two_cc_save': this.secondCreditCardSave(),
+                    'cc_two_cc_id': this.secondCreditCardId(),
+                    'cc_two_installments': this.secondCreditCardInstallments(),
+                    'cc_two_cc_encrypted': this.secondCreditCardEncrypted,
+                    'cc_two_cc_amount': this.secondCreditCardAmount()
+                }
+            };
+        },
+
+        /**
+         * Check if payment is active
+         *
+         * @returns {Boolean}
+         */
+        isActive: function() {
+            return this.getCode() === this.isChecked();
+        },
+
+        /**
+         * @return {Boolean}
+         */
+        validate: function () {
+            const $form = $('#' + 'form_' + this.getCode());
+
+            if (($form.validation() && $form.validation('isValid'))) {
+                this.encryptCard();
+            }
+
+            return ($form.validation() && $form.validation('isValid'));
+        },
+
+        /**
+         * @returns {boolean|*}
+         */
+        retrieveInstallmentsUrl: function() {
+            try {
+                this.installmentsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments;
+                return this.installmentsUrl;
+            } catch (e) {
+                console.log('Installments URL not defined');
+            }
+            return false;
+        },
+
+        /**
+         * @returns {boolean|*}
+         */
+        retrieveCardsUrl: function() {
+            try {
+                this.cardsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].cards;
+                return this.cardsUrl;
+            } catch (e) {
+                console.log('Cards URL not defined');
+            }
+            return false;
+        },
+
+        updateCardsValues: function() {
+            var self = this;
+            self.firstCards.removeAll();
+            self.secondCards.removeAll();
+            new Promise((resolve) => {
+                fetch(self.retrieveCardsUrl(), {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    headers: {'Content-Type': 'application/json'}
+                }).then((response) => {
+                    return response.json();
+                }).then(json => {
+                    json.forEach(function(card) {
+                        self.firstCards.push(card);
+                        self.secondCards.push(card);
+                        self.hasCards(true);
                     });
                 });
+            });
 
-            },
+        },
 
-            isLoggedIn: function() {
-                return customer.isLoggedIn();
-            },
+        isLoggedIn: function() {
+            return customer.isLoggedIn();
+        },
 
-            updateInstallmentsValues: function() {
-                var self = this;
-                self.showLoadingInstallment(true)
+        updateInstallmentsValues: function() {
+            var self = this;
+            self.showLoadingInstallment(true)
 
-                new Promise((resolve) => {
-                    fetch(self.retrieveInstallmentsUrl(), {
-                        method: 'POST',
-                        cache: 'no-cache',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({'amount': self.firstCreditCardAmount()})
-                    }).then((response) => {
-                        self.cardOneInstallments.removeAll();
-                        return response.json();
-                    }).then(json => {
-                        json.forEach(function(installment) {
-                            self.cardOneInstallments.push(installment);
-                            self.cardOneHasInstallments(true);
-                        });
+            new Promise((resolve) => {
+                fetch(self.retrieveInstallmentsUrl(), {
+                    method: 'POST',
+                    cache: 'no-cache',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({'amount': self.firstCreditCardAmount()})
+                }).then((response) => {
+                    self.cardOneInstallments.removeAll();
+                    return response.json();
+                }).then(json => {
+                    json.forEach(function(installment) {
+                        self.cardOneInstallments.push(installment);
+                        self.cardOneHasInstallments(true);
                     });
                 });
+            });
 
-                new Promise((resolve) => {
-                    fetch(self.retrieveInstallmentsUrl(), {
-                        method: 'POST',
-                        cache: 'no-cache',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({'amount': self.secondCreditCardAmount()})
-                    }).then((response) => {
-                        self.cardTwoInstallments.removeAll();
-                        return response.json();
-                    }).then(json => {
-                        json.forEach(function(installment) {
-                            self.cardTwoInstallments.push(installment);
-                            self.cardTwoHasInstallments(true);
-                        });
-                        self.showLoadingInstallment(false)
+            new Promise((resolve) => {
+                fetch(self.retrieveInstallmentsUrl(), {
+                    method: 'POST',
+                    cache: 'no-cache',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({'amount': self.secondCreditCardAmount()})
+                }).then((response) => {
+                    self.cardTwoInstallments.removeAll();
+                    return response.json();
+                }).then(json => {
+                    json.forEach(function(installment) {
+                        self.cardTwoInstallments.push(installment);
+                        self.cardTwoHasInstallments(true);
                     });
+                    self.showLoadingInstallment(false)
                 });
+            });
 
-                return true;
-            },
+            return true;
+        },
 
-            canSave: function() {
-                return window.checkoutConfig.payment.ccform.canSave[this.getCode()];
-            },
+        canSave: function() {
+            return window.checkoutConfig.payment.ccform.canSave[this.getCode()];
+        },
 
-            canEncrypt: function() {
-                return window.checkoutConfig.payment.ccform.canEncrypt[this.getCode()];
-            },
+        canEncrypt: function() {
+            return window.checkoutConfig.payment.ccform.canEncrypt[this.getCode()];
+        },
 
-            minInstallmentValue: function() {
-                return Number(window.checkoutConfig.payment.ccform.minInstallment[this.getCode()]);
-            },
+        minInstallmentValue: function() {
+            return Number(window.checkoutConfig.payment.ccform.minInstallment[this.getCode()]);
+        },
 
-            grandTotal: function() {
-                cartCache.set('totals',null);
-                defaultTotal.estimateTotals();
+        grandTotal: function() {
+            cartCache.set('totals',null);
+            defaultTotal.estimateTotals();
 
-                var totals = quote.getTotals()();
+            var totals = quote.getTotals()();
 
-                let grandTotal = totals ? Number(totals['grand_total']) : Number(quote['grand_total']);
-                let pagseguroInterest = totals ? this.getSegmentTotal(totals) : 0;
+            let grandTotal = totals ? Number(totals['grand_total']) : Number(quote['grand_total']);
+            let pagseguroInterest = totals ? this.getSegmentTotal(totals) : 0;
 
-                if (pagseguroInterest) {
-                    grandTotal -= Number(pagseguroInterest);
+            if (pagseguroInterest) {
+                grandTotal -= Number(pagseguroInterest);
+            }
+
+            return grandTotal;
+        },
+
+        getSegmentTotal: function (totals) {
+            let pagseguroInterest = 0;
+            let sumTotals = 0;
+
+            let discountSegments = totals['total_segments'].filter(function (segment) {
+                return segment.code.indexOf('pagseguropayment_interest') !== -1;
+            });
+
+            pagseguroInterest = discountSegments.length ? Number(discountSegments[0].value) : 0;
+
+            if (!pagseguroInterest && totals['total_segments'].length < 5) {
+                for (let key in totals['total_segments']) {
+                    sumTotals += totals['total_segments'][key]['code'] !== 'grand_total' ? totals['total_segments'][key]['value'] : 0
                 }
+            }
 
-                return grandTotal;
-            },
+            return pagseguroInterest ? pagseguroInterest : totals['grand_total'] - sumTotals;
+        },
 
-            getSegmentTotal: function (totals) {
-                let pagseguroInterest = 0;
-                let sumTotals = 0;
-
-                let discountSegments = totals['total_segments'].filter(function (segment) {
-                    return segment.code.indexOf('pagseguropayment_interest') !== -1;
-                });
-
-                pagseguroInterest = discountSegments.length ? Number(discountSegments[0].value) : 0;
-
-                if (!pagseguroInterest && totals['total_segments'].length < 5) {
-                    for (let key in totals['total_segments']) {
-                        sumTotals += totals['total_segments'][key]['code'] !== 'grand_total' ? totals['total_segments'][key]['value'] : 0
-                    }
+        /**
+         * Get credit card details
+         * @returns {Array}
+         */
+        getInfo: function () {
+            return [
+                {
+                    'name': 'Credit Card Type', value: this.getCcTypeTitleByCode(this.firstCreditCardType())
+                },
+                {
+                    'name': 'Credit Card Number', value: this.formatDisplayCcNumber(this.pagseguroPaymentFirstCreditCardNumber())
                 }
+            ];
+        },
 
-                return pagseguroInterest ? pagseguroInterest : totals['grand_total'] - sumTotals;
-            },
+        encryptCard: function () {
+            let firstCardEncrypt = PagSeguro.encryptCard({
+                publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB',  //window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
+                holder: this.firstCreditCardOwner(),
+                number: this.pagseguroPaymentFirstCreditCardNumber(),
+                expMonth: this.firstCreditCardExpMonth(),
+                expYear: this.firstCreditCardExpYear(),
+                securityCode: this.firstCreditCardVerificationNumber()
+            });
+            this.firstCreditCardEncrypted = firstCardEncrypt.encryptedCard;
 
-            /**
-             * Get credit card details
-             * @returns {Array}
-             */
-            getInfo: function () {
-                return [
-                    {
-                        'name': 'Credit Card Type', value: this.getCcTypeTitleByCode(this.firstCreditCardType())
-                    },
-                    {
-                        'name': 'Credit Card Number', value: this.formatDisplayCcNumber(this.pagseguroPaymentFirstCreditCardNumber())
-                    }
-                ];
-            },
+            let secondCardEncrypt = PagSeguro.encryptCard({
+                publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB',  //window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
+                holder: this.secondCreditCardOwner(),
+                number: this.pagseguroPaymentSecondCreditCardNumber(),
+                expMonth: this.secondCreditCardExpMonth(),
+                expYear: this.secondCreditCardExpYear(),
+                securityCode: this.secondCreditCardVerificationNumber()
+            });
+            this.secondCreditCardEncrypted = secondCardEncrypt.encryptedCard;
 
-            encryptCard: function () {
-                let firstCardEncrypt = PagSeguro.encryptCard({
-                    publicKey: window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
-                    holder: this.firstCreditCardOwner(),
-                    number: this.pagseguroPaymentFirstCreditCardNumber(),
-                    expMonth: this.firstCreditCardExpMonth(),
-                    expYear: this.firstCreditCardExpYear(),
-                    securityCode: this.firstCreditCardVerificationNumber()
-                });
-                this.firstCreditCardEncrypted = firstCardEncrypt.encryptedCard;
+        },
 
-                let secondCardEncrypt = PagSeguro.encryptCard({
-                    publicKey: window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
-                    holder: this.secondCreditCardOwner(),
-                    number: this.pagseguroPaymentSecondCreditCardNumber(),
-                    expMonth: this.secondCreditCardExpMonth(),
-                    expYear: this.secondCreditCardExpYear(),
-                    securityCode: this.secondCreditCardVerificationNumber()
-                });
-                this.secondCreditCardEncrypted = secondCardEncrypt.encryptedCard;
+        updateTwoCardAmount: function (amount, field) {
+            let focusedCardAmountElement = field === 'card_one' ? this.firstCreditCardAmount : this.secondCreditCardAmount;
+            let secondCardAmountElement = field === 'card_one' ? this.secondCreditCardAmount : this.firstCreditCardAmount;
 
-            },
+            let focusedCardAmount = Number(focusedCardAmountElement());
 
-            updateTwoCardAmount: function (amount, field) {
-                let focusedCardAmountElement = field === 'card_one' ? this.firstCreditCardAmount : this.secondCreditCardAmount;
-                let secondCardAmountElement = field === 'card_one' ? this.secondCreditCardAmount : this.firstCreditCardAmount;
+            if (focusedCardAmount < this.minInstallmentValue()) {
+                focusedCardAmount = this.minInstallmentValue();
+            }
 
-                let focusedCardAmount = Number(focusedCardAmountElement());
+            let grandTotal = this.grandTotal();
+            let maxValue = grandTotal - this.minInstallmentValue();
 
-                if (focusedCardAmount < this.minInstallmentValue()) {
-                    focusedCardAmount = this.minInstallmentValue();
-                }
+            if (focusedCardAmountElement() > maxValue) {
+                focusedCardAmount = maxValue;
+            }
 
-                let grandTotal = this.grandTotal();
-                let maxValue = grandTotal - this.minInstallmentValue();
+            focusedCardAmount !== Number(focusedCardAmountElement()) ? focusedCardAmountElement(focusedCardAmount.toFixed(2)) : false;
 
-                if (focusedCardAmountElement() > maxValue) {
-                    focusedCardAmount = maxValue;
-                }
+            let secondCardAmount = Number(grandTotal - focusedCardAmountElement());
+            secondCardAmount !== Number(secondCardAmountElement()) ? secondCardAmountElement(secondCardAmount.toFixed(2)) : false;
 
-                focusedCardAmount !== Number(focusedCardAmountElement()) ? focusedCardAmountElement(focusedCardAmount.toFixed(2)) : false;
-
-                let secondCardAmount = Number(grandTotal - focusedCardAmountElement());
-                secondCardAmount !== Number(secondCardAmountElement()) ? secondCardAmountElement(secondCardAmount.toFixed(2)) : false;
-
-                this.updateInstallmentsValues()
-            },
-        });
-    }
+            this.updateInstallmentsValues()
+        },
+    });
+}
 );

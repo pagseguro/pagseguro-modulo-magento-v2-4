@@ -53,7 +53,9 @@ class RefundRequest implements BuilderInterface
         $request->amount = $value;
 
         $clientConfig = [
-            'transaction_id' => $payment->getAdditionalInformation('id')
+            'transaction_id' => $payment->getAdditionalInformation('id'),
+            'payment'        => $payment,
+            'request'        => $request,
         ];
 
         return ['request' => $request, 'client_config' => $clientConfig];

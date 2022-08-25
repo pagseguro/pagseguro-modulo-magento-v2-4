@@ -158,11 +158,12 @@ class TransactionRequest implements BuilderInterface
         $request->reference_id = $this->getOrder()->getIncrementId();
         $request->customer = $this->getCustomerData();
         $request->items = $this->getItemsData($amount);
+
+        $request->charges = [$this->getChargeData($request, $payment, $amount)];
+
         $request->notification_urls = [
             $this->helper->getUrlBuilder()->getUrl('pagseguropayment/notification/orders')
         ];
-
-        $request->charges = [$this->getChargeData($request, $payment, $amount)];
 
         return ['request' => $request];
     }

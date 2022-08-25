@@ -71,7 +71,11 @@ class TransactionHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        $transaction = $response['transaction']['charges'][0];
+        if (isset($response['transaction']['charges'])) {
+            $transaction = $response['transaction']['charges'][0];
+        } else {
+            $transaction = $response['transaction'];
+        }
 
         if (isset($transaction['error_messages']) || $transaction['status'] > 301) {
             throw new LocalizedException(__('There was an error processing your request.'));
