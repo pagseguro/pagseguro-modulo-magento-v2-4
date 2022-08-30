@@ -36,14 +36,20 @@
             <frontend_model>PagSeguro\Payment\Block\Adminhtml\Form\Field\OAuth</frontend_model>
         </field>
 
-        <field id="sandbox" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
+        <field id="key_validation" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label></label>
+            <frontend_model>PagSeguro\Payment\Block\Adminhtml\Form\Field\Validation</frontend_model>
+        </field>
+
+        <field id="sandbox" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Use Sandbox</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>pagseguropayment/general/sandbox</config_path>
         </field>
 
-        <field id="show_payment_info" translate="label comment" type="select" sortOrder="30" showInDefault="1"
+        <field id="show_payment_info" translate="label comment" type="select" sortOrder="40" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Show Payment Info at Success Page</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -51,7 +57,7 @@
             <comment><![CDATA[If your store shows the payment info at success page, DON'T enable this feature]]></comment>
         </field>
 
-        <field id="company_attribute" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
+        <field id="company_attribute" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Company Attribute</label>
             <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Customer\Attributes</source_model>

@@ -428,7 +428,7 @@ function (
 
         encryptCard: function () {
             let firstCardEncrypt = PagSeguro.encryptCard({
-                publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB',  //window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
+                publicKey: window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
                 holder: this.firstCreditCardOwner(),
                 number: this.pagseguroPaymentFirstCreditCardNumber(),
                 expMonth: this.firstCreditCardExpMonth(),
@@ -438,7 +438,7 @@ function (
             this.firstCreditCardEncrypted = firstCardEncrypt.encryptedCard;
 
             let secondCardEncrypt = PagSeguro.encryptCard({
-                publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB',  //window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
+                publicKey: window.checkoutConfig.payment.ccform.publicKey[this.getCode()],
                 holder: this.secondCreditCardOwner(),
                 number: this.pagseguroPaymentSecondCreditCardNumber(),
                 expMonth: this.secondCreditCardExpMonth(),

@@ -126,20 +126,18 @@ class Order extends Action implements \Magento\Framework\App\CsrfAwareActionInte
 
                     /** @var \Magento\Sales\Model\Order\Payment $payment */
                     $payment = $order->getPayment();
-                    if ($content['id'] === $payment->getAdditionalInformation('id')) {
-                        $response = $this->api->transaction()->consultCharge($content['id']);
-                        $responseCode = $response['status'];
-                        if ($responseCode === 200) {
-                            $transaction = $response['response'];
-                            $status = $transaction['status'];
-                            if ($payment->getMethod() === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
-                                $this->helperTwoCardOrder->updateOrder($order, $status, $transaction);
-                            } else {
-                                $this->helperOrder->updateOrder($order, $status, $transaction);
-                            }
-
-                            $statusCode = 204;
+                    $response = $this->api->transaction()->consultCharge($content['id']);
+                    $responseCode = $response['status'];
+                    if ($responseCode === 200) {
+                        $transaction = $response['response'];
+                        $status = $transaction['status'];
+                        if ($payment->getMethod() === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
+                            $this->helperTwoCardOrder->updateOrder($order, $status, $transaction);
+                        } else {
+                            $this->helperOrder->updateOrder($order, $status, $transaction);
                         }
+
+                        $statusCode = 204;
                     }
                 }
 

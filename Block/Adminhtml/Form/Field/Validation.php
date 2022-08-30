@@ -24,10 +24,21 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\Store;
+use PagSeguro\Payment\Helper\Data as HelperData;
+use Magento\Backend\Block\Template\Context;
 
 
 class Validation extends Field
 {
+
+    protected $helperData;
+
+    public function __construct(Context $context, HelperData $helperData)
+    {
+        $this->helperData = $helperData;
+        parent::__construct($context);
+    }
+
     /**
      * @inheritDoc
      */
@@ -42,41 +53,37 @@ class Validation extends Field
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        // Replace field markup with validation button
-        $title = __('Autorize a sua conta');
 
-        $storeId = 0;
+        $html = '';
+        $token = $this->helperData->getGeneralConfig('token');
 
-        if ($this->getRequest()->getParam('website')) {
+        if ($token) {
 
-            $website = $this->_storeManager->getWebsite($this->getRequest()->getParam('website'));
+            // Replace field markup with validation button
+            $title = __('Valide a sua conta');
+            $storeId = 0;
 
-            if ($website->getId()) {
-
-                /** @var Store $store */
-                $store = $website->getDefaultStore();
-
-                $storeId = $store->getStoreId();
-
+            if ($this->getRequest()->getParam('website')) {
+                $website = $this->_storeManager->getWebsite($this->getRequest()->getParam('website'));
+                if ($website->getId()) {
+                    /** @var Store $store */
+                    $store = $website->getDefaultStore();
+                    $storeId = $store->getStoreId();
+                }
             }
 
+            $endpoint = $this->getUrl('pagseguropayment/credential/validate', ['storeId' => $storeId]);
+            $html = "
+                <button
+                    type=\"button\"
+                    title=\"{$title}\"
+                    class=\"button\"
+                    onclick=\"pagseguroPaymentValidator.call(this, '{$endpoint}')\">
+                    <span>{$title}</span>
+                </button>
+                <input id='payment_other_pagseguropayment_pagseguropayment_general_token' type='hidden' value='{$token}'>";
+
         }
-
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-        $endpoint = $this->getUrl('pagseguropayment/credential/validate', ['storeId' => $storeId]);
-
-        $client_id = 'df6a3129-eaee-42c5-8a3c-c7f1bdee1380';
-
-        $html = "
-            <button
-                type=\"button\"
-                id=\"pagseguro-oauth-button\"
-                title=\"{$title}\"
-                class=\"button\"
-                onclick=\"paseguroOauthRedirect.call(this, '{$client_id}')\">
-                <span>{$title}</span>
-            </button>";
 
         return $html;
     }

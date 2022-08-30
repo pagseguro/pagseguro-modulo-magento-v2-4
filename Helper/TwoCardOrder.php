@@ -160,6 +160,9 @@ class TwoCardOrder extends \Magento\Payment\Helper\Data
             $currentFirstCcStatus = $payment->getAdditionalInformation('first_cc_status');
             $currentSecondCcStatus = $payment->getAdditionalInformation('second_cc_status');
 
+            $this->helperData->log(print_r($secondTransaction, true));
+            $this->helperData->log(print_r($currentSecondCcStatus, true));
+
             if (!$secondTransaction)
                 throw new \Exception(__('There was an error trying to get second charge information'));
 
@@ -174,7 +177,8 @@ class TwoCardOrder extends \Magento\Payment\Helper\Data
 
             $firstCcStatus = $transaction['status'];
             $secondCcStatus = $secondTransaction['status'];
-
+            $this->helperData->log(print_r($firstCcStatus, true));
+            $this->helperData->log(print_r($secondCcStatus, true));
             if (in_array($payment->getMethod(), $this->helperData->getAllowedMethods())) {
                 if ($firstCcStatus === Api::STATUS_PAID && $secondCcStatus === Api::STATUS_PAID) {
 
