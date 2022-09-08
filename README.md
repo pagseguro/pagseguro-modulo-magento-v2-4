@@ -10,8 +10,7 @@ Esse módulo é compatível com a versão 2.4 do Magento. Ele utiliza a API Char
 
 ## Instalação utilizando composer
 
-- composer config repositories.pagseguro-pagseguropayment git https://bitbucket.org/gingainterno/magento-v1-charge/src/master/ *OBS.: É NECESSÁRIO ALTERAR ESSE REPOSITÓRIO PARA UM OFICIAL DO PAGSEGURO*
-- composer require pagseguro/pagseguropayment:dev-master
+- composer config repositories.pagseguro-pagseguropayment git https://github.com/pagseguro/pagseguro-modulo-magento-v2-4
 
 - php bin/magento setup:upgrade
 - php bin/magento setup:di:compile
