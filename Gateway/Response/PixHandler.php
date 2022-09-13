@@ -76,11 +76,13 @@ class PixHandler implements HandlerInterface {
 
                     } // end if;
 
+                    $expirationDate = $qr_code['expiration_date'];
+
                 } // end foreach;
 
                 $payment->setAdditionalInformation('print_options', [
                     'linhadigitavel'    => $digitableText,
-                    'qrcode_image'      => $qrcode_image
+                    'qrcode_image'      => $qrcode_image,
                 ]);
 
             } // end if;
@@ -94,6 +96,12 @@ class PixHandler implements HandlerInterface {
             if (isset($digitableText)) {
 
                 $payment->setAdditionalInformation('qrcode', $qrcode_image);
+
+            }
+
+            if (isset($expirationDate)) {
+
+                $payment->setAdditionalInformation('expiration_date', $expirationDate);
 
             }
         }

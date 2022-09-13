@@ -153,7 +153,7 @@ class TransactionRequest implements BuilderInterface
         $request->items = $this->getItemsData($amount);
 
         if ($method == \PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE) {
-            $request->qr_codes = $this->getQRCodesData($amount);
+        $request->qr_codes = $this->getQRCodesData($amount, $payment);
         } else {
             $request->charges = [$this->getChargeData($request, $payment, $amount)];
         }
@@ -320,15 +320,15 @@ class TransactionRequest implements BuilderInterface
     /**
      * @return \stdClass
      */
-    protected function getQRCodesData($amount)
+    protected function getQRCodesData($amount, $payment)
     {
         $qrCodes = new \stdClass();
 
         $qrCodes->amount = [
             'value' => $amount
         ];
-
-        $qrCodes->expiration_date = $this->date->date('Y-m-d\TH:i:s-H:i', strtotime('tomorrow'));
+        $expirationDays = $payment->getMethodInstance()->getConfigData('expiration_days') ?: 1;
+        $qrCodes->expiration_date = $this->date->date('Y-m-d\TH:i:s-H:i', strtotime('+ ' . $expirationDays . ' days'));
 
         return [$qrCodes];
     }

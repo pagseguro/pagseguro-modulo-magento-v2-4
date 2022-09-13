@@ -69,8 +69,6 @@ class Pix extends AbstractInfo
     {
         $payment = $this->getInfo();
 
-        $expirationDate = $this->date->date('d/m/Y', strtotime('tomorrow'));
-
         $pixPrintOptions = [];
         if ($payment->getAdditionalInformation('print_options')) {
             foreach ($payment->getAdditionalInformation('print_options') as $key => $printOption) {
@@ -78,12 +76,11 @@ class Pix extends AbstractInfo
             }
         }
 
-
         $body = [
             (string)__('TID') => $payment->getAdditionalInformation('id'),
             (string)__('Pix') => implode(' | ', $pixPrintOptions),
             (string)__('Linha Digitável') => $payment->getAdditionalInformation('linhadigitavel'),
-            (string)__('Expiration Date') => $expirationDate
+            (string)__('Expiration Date') => date_format(date_create($payment->getAdditionalInformation('expiration_date')), 'd-m-Y H:i:s'),
         ];
 
         $transport = new DataObject($body);
