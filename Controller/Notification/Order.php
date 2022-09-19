@@ -108,11 +108,11 @@ class Order extends Action implements \Magento\Framework\App\CsrfAwareActionInte
         $statusCode = 500;
 
         try {
-            $content = $this->getContent($this->getRequest());
-            $content = $content['charges'][0];
+            $originalContent = $this->getContent($this->getRequest());
+            $content = $originalContent['charges'][0];
             $params = $this->getRequest()->getParams();
 
-            $this->logParams($content, $params);
+            $this->logParams($originalContent, $params);
 
             if (isset($content['reference_id'])) {
                 $orderIncrementId = $content['reference_id'] ?? null;
@@ -131,6 +131,13 @@ class Order extends Action implements \Magento\Framework\App\CsrfAwareActionInte
                     if ($responseCode === 200) {
                         $transaction = $response['response'];
                         $status = $transaction['status'];
+
+                        if ($payment->getMethod() === \PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE) {
+
+                            $payment->setAdditionalInformation('id', $originalContent['id']);
+                            $payment->setTransactionId($originalContent['id']);
+                        }
+
                         if ($payment->getMethod() === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
                             $this->helperTwoCardOrder->updateOrder($order, $status, $transaction);
                         } else {

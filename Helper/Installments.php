@@ -57,17 +57,22 @@ class Installments extends AbstractHelper
         parent::__construct($context);
     }
 
-    public function getAllInstallments($price = null, $configSection = 'pagseguropayment')
+    public function getAllInstallments($price = null, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment')
     {
         $allInstallments = [
             ['value' => 1, 'text' => __('1x of %1 (without interest)', $this->priceCurrency->format($price, false))]
         ];
+        $this->helper->log($this->helper->getConfig('max_installments', $configGroup, $configSection));
+        $this->helper->log($this->helper->getConfig('interest_rate', $configGroup, $configSection));
+        $this->helper->log($this->helper->getConfig('minimum_installment_amount', $configGroup, $configSection));
+        $this->helper->log($this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection));
         try {
             if ($price > 0) {
-                $maxInstallments = (int)$this->helper->getConfig('max_installments', $configSection) ?: 1;
-                $defaultInterestRate = (float)$this->helper->getConfig('interest_rate', $configSection);
-                $minInstallmentAmount = (float)$this->helper->getConfig('minimum_installment_amount', $configSection);
-                $installmentsWithoutInterest = (int)$this->helper->getConfig('max_installments_without_interest', $configSection) ?: 1;
+                $maxInstallments = (int) $this->helper->getConfig('max_installments', $configGroup, $configSection) ?: 1;
+                $defaultInterestRate = (float)$this->helper->getConfig('interest_rate', $configGroup, $configSection);
+                $minInstallmentAmount = (float)$this->helper->getConfig('minimum_installment_amount', $configGroup, $configSection);
+                $installmentsWithoutInterest = (int)$this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection) ?: 1;
+
 
                 if ($minInstallmentAmount > 0) {
                     while ($maxInstallments > ($price / $minInstallmentAmount))
@@ -81,20 +86,20 @@ class Installments extends AbstractHelper
                 for ($i = 2; $i <= $maxInstallments; $i++) {
                     $interestRate = ($i <= $installmentsWithoutInterest) ? 0 : $defaultInterestRate;
                     if (!$interestRate) {
-                        $interestType = $this->helper->getConfig('interest_type', $configSection);
+                        $interestType = $this->helper->getConfig('interest_type', $configGroup, $configSection);
                         if ($interestType == 'per_installments') {
                             // Interest per number of installments
-                            $interestRate = (float)$this->helper->getConfig('interest_' . $i . '_installments', $configSection) / 100;
+                            $interestRate = (float)$this->helper->getConfig('interest_' . $i . '_installments', $configGroup, $configSection) / 100;
                         }
                     }
 
                     $value = ($i <= $installmentsWithoutInterest)
                         ? ($price / $i)
-                        : $this->getInstallmentPrice($price, $i, $interestRate, $configSection);
+                        : $this->getInstallmentPrice($price, $i, $interestRate, $configGroup);
 
                     $total = $value * $i;
-
-                    $interestText = ($interestRate) ? __('with interest') : __('without interest');
+                    $hasInterest = $this->helper->getConfig('has_interest', $configGroup, $configSection);
+                    $interestText = ($hasInterest) ? __('with interest') : __('without interest');
 
                     $allInstallments[] = [
                         'value' => $i,
@@ -123,20 +128,20 @@ class Installments extends AbstractHelper
      * @return float
      * @throws Exception
      */
-    public function getInstallmentPrice($price, $installment, $interestRate = null, $configSection = 'pagseguropayment')
+    public function getInstallmentPrice($price, $installment, $interestRate = null, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment')
     {
         $installmentAmount = $price / $installment;
 
         try {
-            $installmentsWithoutInterest = (int)$this->helper->getConfig('max_installments_without_interest', $configSection) ?: 1;
-            $hasInterest = $this->helper->getConfig('has_interest', $configSection);
+            $installmentsWithoutInterest = (int)$this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection) ?: 1;
+            $hasInterest = $this->helper->getConfig('has_interest', $configGroup, $configSection);
             if ($hasInterest && $installment > $installmentsWithoutInterest) {
 
                 if ($interestRate === null)
-                    $interestRate = (float)$this->helper->getConfig('interest_rate', $configSection);
+                    $interestRate = (float)$this->helper->getConfig('interest_rate', $configGroup, $configSection);
 
                 $interestRate = $interestRate / 100;
-                $interestType = $this->helper->getConfig('interest_type', $configSection);
+                $interestType = $this->helper->getConfig('interest_type', $configGroup, $configSection);
 
                 if ($interestRate || $interestType == 'per_installments') {
                     switch ($interestType) {
@@ -154,7 +159,7 @@ class Installments extends AbstractHelper
                             break;
                         case 'per_installments':
                             // Interest per number of installments
-                            $interestRate = (float)$this->helper->getConfig('interest_' . $installment . '_installments', $configSection) / 100;
+                            $interestRate = (float)$this->helper->getConfig('interest_' . $installment . '_installments', $configGroup, $configSection) / 100;
                             $installmentAmount = ($price * (1 + $interestRate)) / $installment;
                             break;
                     }
