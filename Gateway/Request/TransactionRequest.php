@@ -327,8 +327,10 @@ class TransactionRequest implements BuilderInterface
         $qrCodes->amount = [
             'value' => $amount
         ];
-        $expirationDays = $payment->getMethodInstance()->getConfigData('expiration_days') ?: 1;
-        $qrCodes->expiration_date = $this->date->date('Y-m-d\TH:i:s-03:00', strtotime('+ ' . $expirationDays . ' days'));
+        $expirationType = $payment->getMethodInstance()->getConfigData('expiration_type') ?: 'days';
+        $expirationQty = $payment->getMethodInstance()->getConfigData('expiration_quantity') ?: 1;
+
+        $qrCodes->expiration_date = $this->date->date('Y-m-d\TH:i:s-03:00', strtotime('+ ' . $expirationQty . ' ' . $expirationType));
 
         return [$qrCodes];
     }

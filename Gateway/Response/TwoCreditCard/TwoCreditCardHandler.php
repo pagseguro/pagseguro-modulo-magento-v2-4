@@ -96,10 +96,13 @@ class TwoCreditCardHandler implements HandlerInterface
         } else {
             $transaction = $response['transaction'];
         }
+        $this->api->logRequest('PRIMEIRA TRANSAÇÃO');
+        $this->api->logRequest($transaction);
 
         /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment = $paymentData->getPayment();
         $this->api->logRequest($payment);
+
         if (isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID) {
             $message = $transaction['payment_response']['message'];
             throw new LocalizedException(__($message));
@@ -113,11 +116,10 @@ class TwoCreditCardHandler implements HandlerInterface
             } else {
                 $secondCcTransaction = $secondCcResponse['transaction'];
             }
-            if (
-                isset($secondCcTransaction['error_messages'])
-                || isset($secondCcTransaction['status'])
-                && $secondCcTransaction['status'] === Api::STATUS_DECLINED
-            ) {
+            $this->api->logRequest('SEGUNDA TRANSAÇÃO');
+            $this->api->logRequest($secondCcTransaction);
+
+            if (isset($secondCcTransaction['error_messages']) || isset($secondCcTransaction['status']) && $secondCcTransaction['status'] !== Api::STATUS_DECLINED) {
                 $canceledTransaction = $this->api->transaction()->cancelCharge(
                     $transaction['id'],
                     $this->getAmountData($transaction['amount']['summary']['total'])
@@ -131,6 +133,11 @@ class TwoCreditCardHandler implements HandlerInterface
                 $this->setSecondCcAdditionalInformation($payment, $secondCcTransaction);
                 $this->setSecondCardInformation($payment, $secondCcTransaction['payment_method']['card']);
             }
+
+            if ($transaction['status'] === Api::STATUS_PAID && $secondCcTransaction['status'] === Api::STATUS_PAID) {
+                $payment->setAdditionalInformation('status', Api::STATUS_PAID);
+            }
+
         }
 
         if (isset($transaction['id'])) {
@@ -140,6 +147,7 @@ class TwoCreditCardHandler implements HandlerInterface
         if (isset($transaction['payment_method']) && isset($transaction['payment_method']['card'])) {
             $this->setCardInformation($payment, $transaction['payment_method']['card']);
         }
+
     }
 
     /**

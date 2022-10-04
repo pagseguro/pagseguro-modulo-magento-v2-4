@@ -100,6 +100,8 @@
                 <paymentInfoKeys>id,authorization_code,status</paymentInfoKeys>
                 <privateInfoKeys>id,authorization_code,status</privateInfoKeys>
                 <debug>1</debug>
+                <expiration_quantity>1</expiration_quantity>
+                <expiration_type>days</expiration_type>
             </pagseguropayment_pix>
 
             <pagseguropayment_one_cc>

@@ -34,11 +34,17 @@
             <config_path>payment/pagseguropayment_pix/title</config_path>
         </field>
 
-        <field id="expiration_days" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Expiration Days</label>
-            <config_path>payment/pagseguropayment_pix/expiration_days</config_path>
+        <field id="expiration_type" translate="label" type="select" sortOrder="201" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Interest Type</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\PixExpirationType</source_model>
+            <config_path>payment/pagseguropayment_pix/expiration_type</config_path>
+        </field>
+
+        <field id="expiration_quantity" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Expiration Quantity</label>
+            <config_path>payment/pagseguropayment_pix/expiration_quantity</config_path>
             <frontend_class>validate-number</frontend_class>
-            <comment>Number of days to expire the Pix</comment>
+            <comment>Number of minutes, hours or days to expire the Pix. Based on the Expiration Type setting.</comment>
         </field>
 
         <field id="checkout_instructions" translate="label comment" type="textarea" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
