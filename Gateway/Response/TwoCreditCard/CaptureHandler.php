@@ -45,11 +45,7 @@ class CaptureHandler implements HandlerInterface
 
         /** @var PaymentDataObjectInterface $paymentData */
         $paymentData = $handlingSubject['payment'];
-        if (isset($response['transaction']['charges'])) {
-            $transaction = $response['transaction']['charges'][0];
-        } else {
-            $transaction = $response['transaction'];
-        }
+        $transaction = $response['transaction'];
 
         if (isset($transaction['first_cc']['error_messages']) || isset($transaction['second_cc']['error_messages'])) {
             throw new LocalizedException(__('There was an error with your payment data'));

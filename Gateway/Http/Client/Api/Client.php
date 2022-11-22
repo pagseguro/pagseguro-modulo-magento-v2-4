@@ -127,12 +127,20 @@ class Client
 
     protected function getClientId()
     {
-        return $this->helper->getApplicationConfig('client_id');
+        $client_id = $this->helper->getApplicationConfig('client_id');
+        if ($this->helper->getGeneralConfig('sandbox')) {
+            $client_id = $this->helper->getApplicationConfig('client_id_sandbox');
+        }
+        return $client_id;
     }
 
     protected function getChiperText()
     {
-        return $this->helper->getApplicationConfig('cipher_text');
+        $cipher_text = $this->helper->getApplicationConfig('cipher_text');
+        if ($this->helper->getGeneralConfig('sandbox')) {
+            $cipher_text = $this->helper->getApplicationConfig('cipher_text_sandbox');
+        }
+        return $cipher_text;
     }
 
 

@@ -310,9 +310,14 @@ class Data extends \Magento\Payment\Helper\Data
 
         $code = $this->getCodeChallenge();
 
+        $client_id = $this->getApplicationConfig('client_id');
+        if ($this->getGeneralConfig('sandbox')) {
+            $client_id = $this->getApplicationConfig('client_id_sandbox');
+        }
+
         $params = array(
             'response_type'         => 'code',
-            'client_id'             =>  $this->getApplicationConfig('client_id'),
+            'client_id'             =>  $client_id,
             'scope'                 => 'payments.read+payments.create+payments.refund',
             'state'                 => 'active',
             'code_challenge'        => $code['challenge'],
@@ -325,10 +330,15 @@ class Data extends \Magento\Payment\Helper\Data
 
         $queryParams = str_replace('%2B', '+', $queryParams);
 
+        $cipher_text = $this->getApplicationConfig('cipher_text');
+        if ($this->getGeneralConfig('sandbox')) {
+            $cipher_text = $this->getApplicationConfig('cipher_text_sandbox');
+        }
+
         return [
             'url'           => $oAuthURL . '?' . $queryParams,
             'code_verifier' => $code['verifier'],
-            'cipher_text'   => $this->getApplicationConfig('cipher_text')
+            'cipher_text'   => $cipher_text
         ];
     }
 

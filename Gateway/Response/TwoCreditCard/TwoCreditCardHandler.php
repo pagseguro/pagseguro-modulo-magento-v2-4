@@ -119,7 +119,7 @@ class TwoCreditCardHandler implements HandlerInterface
             $this->api->logRequest('SEGUNDA TRANSAÇÃO');
             $this->api->logRequest($secondCcTransaction);
 
-            if (isset($secondCcTransaction['error_messages']) || isset($secondCcTransaction['status']) && $secondCcTransaction['status'] !== Api::STATUS_DECLINED) {
+            if (isset($secondCcTransaction['error_messages']) || isset($secondCcTransaction['status']) && $secondCcTransaction['status'] !== Api::STATUS_PAID) {
                 $canceledTransaction = $this->api->transaction()->cancelCharge(
                     $transaction['id'],
                     $this->getAmountData($transaction['amount']['summary']['total'])

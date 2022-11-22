@@ -97,6 +97,8 @@ class PaymentConfigSaveAfter implements ObserverInterface
         $this->cacheTypeList->cleanType(Config::TYPE_IDENTIFIER);
         $this->appConfig->reinit();
 
+        $this->helper->log('oauth_code');
+        $this->helper->log($this->helper->getGeneralConfig('oauth_code'));
         if ($this->helper->getGeneralConfig('oauth_code')) {
             $this->createToken();
         }
@@ -108,7 +110,6 @@ class PaymentConfigSaveAfter implements ObserverInterface
      */
     protected function createToken()
     {
-        $this->helper->log('########## execuuuutaaaaaaa brasillll');
         $code = $this->helper->getGeneralConfig('oauth_code');
 
         $data = [

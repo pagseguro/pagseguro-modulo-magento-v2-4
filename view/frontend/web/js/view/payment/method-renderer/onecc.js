@@ -245,6 +245,7 @@ function (
                     return response.json();
                 }).then(json => {
                     json.forEach(function(installment) {
+                        console.log(installment)
                         self.installments.push(installment);
                         self.hasInstallments(true);
                     });

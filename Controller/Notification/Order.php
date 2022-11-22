@@ -134,8 +134,8 @@ class Order extends Action implements \Magento\Framework\App\CsrfAwareActionInte
 
                         if ($payment->getMethod() === \PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE) {
 
-                            $payment->setAdditionalInformation('id', $originalContent['id']);
-                            $payment->setTransactionId($originalContent['id']);
+                            $payment->setAdditionalInformation('id', $content['id']);
+                            $payment->setTransactionId($content['id']);
                         }
 
                         if ($payment->getMethod() === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {

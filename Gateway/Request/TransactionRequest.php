@@ -153,7 +153,7 @@ class TransactionRequest implements BuilderInterface
         $request->items = $this->getItemsData($amount);
 
         if ($method == \PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE) {
-        $request->qr_codes = $this->getQRCodesData($amount, $payment);
+            $request->qr_codes = $this->getQRCodesData($amount, $payment);
         } else {
             $request->charges = [$this->getChargeData($request, $payment, $amount)];
         }
@@ -161,6 +161,8 @@ class TransactionRequest implements BuilderInterface
         $request->notification_urls = [
             $this->helper->getUrlBuilder()->getUrl('pagseguropayment/notification/order')
         ];
+
+        $this->api->logRequest($request);
 
         return ['request' => $request];
     }
