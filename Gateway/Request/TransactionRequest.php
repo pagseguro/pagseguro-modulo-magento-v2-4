@@ -152,7 +152,7 @@ class TransactionRequest implements BuilderInterface
         $request->customer = $this->getCustomerData();
         $request->items = $this->getItemsData($amount);
 
-        if ($method == \PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE) {
+        if ($method === \PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE) {
             $request->qr_codes = $this->getQRCodesData($amount, $payment);
         } else {
             $request->charges = [$this->getChargeData($request, $payment, $amount)];
@@ -204,16 +204,19 @@ class TransactionRequest implements BuilderInterface
         $method = $payment->getMethod();
 
         $paymentMethod = new \stdClass();
-        if ($method == \PagSeguro\Payment\Model\Ticket\Ui\ConfigProvider::CODE) {
+        if ($method === \PagSeguro\Payment\Model\Ticket\Ui\ConfigProvider::CODE) {
 
             $paymentMethod->type = 'BOLETO';
             $paymentMethod->boleto = $this->ticketData($payment);
 
-        } else if ($method == \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE) {
+        } else if ($method === \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE) {
+
+            $this->helper->log('getPaymentData============================================');
+            $this->helper->log(print_r($this->helper->getConfig('payment_action', $method), true));
 
             $paymentMethod->type = 'CREDIT_CARD';
             $paymentMethod->installments = $payment->getAdditionalInformation('installments');
-            $paymentMethod->capture = $this->helper->getConfig('payment_action', $method) == MethodInterface::ACTION_AUTHORIZE ? false : true;
+            $paymentMethod->capture = $this->helper->getConfig('payment_action', $method) === MethodInterface::ACTION_AUTHORIZE ? false : true;
             $paymentMethod->card = $this->getCardData($request, $payment);
 
         }

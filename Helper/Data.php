@@ -234,7 +234,7 @@ class Data extends \Magento\Payment\Helper\Data
             $authenticationService = Mage::getModel('pagseguropayment/service_authentication');
             $response = $authenticationService->validateToken();
 
-            if ($response || $response->getStatus() == 200) {
+            if ($response || $response->getStatus() === 200) {
                 $information = json_decode($response->getBody());
                 $publicKey = $information->public_key;
 

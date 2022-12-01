@@ -247,7 +247,7 @@ class TransactionRequest implements BuilderInterface
 
         $paymentMethod->type = 'CREDIT_CARD';
         $paymentMethod->installments = $payment->getAdditionalInformation('first_cc_installments');
-        $paymentMethod->capture = $this->helper->getConfig('payment_action', $method) == MethodInterface::ACTION_AUTHORIZE ? false : true;
+        $paymentMethod->capture = $this->helper->getConfig('payment_action', $method) === MethodInterface::ACTION_AUTHORIZE ? false : true;
         $paymentMethod->card = $this->getCardData($request, $payment);
 
         return $paymentMethod;
