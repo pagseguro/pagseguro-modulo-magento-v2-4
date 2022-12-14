@@ -103,39 +103,45 @@ class TwoCreditCardHandler implements HandlerInterface
         $payment = $paymentData->getPayment();
         $this->api->logRequest($payment);
 
-        if (isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID) {
+        if (
+            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID &&
+            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_AUTHORIZED
+        ) {
             $message = $transaction['payment_response']['message'];
             throw new LocalizedException(__($message));
         }
 
-        if (isset($transaction['status']) && $transaction['status'] === Api::STATUS_PAID) {
-            $secondCcResponse = $this->helperTwoCard->secondCardRequest($payment);
+        if (isset($transaction['status'])) {
 
-            if (isset($secondCcResponse['transaction']['charges'])) {
-                $secondCcTransaction = $secondCcResponse['transaction']['charges'][0];
-            } else {
-                $secondCcTransaction = $secondCcResponse['transaction'];
-            }
-            $this->api->logRequest('SEGUNDA TRANSAÇÃO');
-            $this->api->logRequest($secondCcTransaction);
+            if ($transaction['status'] === Api::STATUS_PAID || $transaction['status'] === Api::STATUS_AUTHORIZED) {
+                $secondCcResponse = $this->helperTwoCard->secondCardRequest($payment);
 
-            if (isset($secondCcTransaction['error_messages']) || isset($secondCcTransaction['status']) && $secondCcTransaction['status'] !== Api::STATUS_DECLINED) {
-                $canceledTransaction = $this->api->transaction()->cancelCharge(
-                    $transaction['id'],
-                    $this->getAmountData($transaction['amount']['summary']['total'])
-                );
+                if (isset($secondCcResponse['transaction']['charges'])) {
+                    $secondCcTransaction = $secondCcResponse['transaction']['charges'][0];
+                } else {
+                    $secondCcTransaction = $secondCcResponse['transaction'];
+                }
+                $this->api->logRequest('SEGUNDA TRANSAÇÃO');
+                $this->api->logRequest($secondCcTransaction);
 
-                $this->api->logRequest($this->getAmountData($transaction['amount']['summary']['total']));
-                $this->api->logResponse($canceledTransaction);
+                if (isset($secondCcTransaction['error_messages']) || isset($secondCcTransaction['status']) && $secondCcTransaction['status'] !== Api::STATUS_PAID) {
+                    $canceledTransaction = $this->api->transaction()->cancelCharge(
+                        $transaction['id'],
+                        $this->getAmountData($transaction['amount']['summary']['total'])
+                    );
 
-                throw new LocalizedException(__('The transaction for second card was not authorized, check your credit card data and try again'));
-            } else {
-                $this->setSecondCcAdditionalInformation($payment, $secondCcTransaction);
-                $this->setSecondCardInformation($payment, $secondCcTransaction['payment_method']['card']);
-            }
+                    $this->api->logRequest($this->getAmountData($transaction['amount']['summary']['total']));
+                    $this->api->logResponse($canceledTransaction);
 
-            if ($transaction['status'] === Api::STATUS_PAID && $secondCcTransaction['status'] === Api::STATUS_PAID) {
-                $payment->setAdditionalInformation('status', Api::STATUS_PAID);
+                    throw new LocalizedException(__('The transaction for second card was not authorized, check your credit card data and try again'));
+                } else {
+                    $this->setSecondCcAdditionalInformation($payment, $secondCcTransaction);
+                    $this->setSecondCardInformation($payment, $secondCcTransaction['payment_method']['card']);
+                }
+
+                if ($transaction['status'] === Api::STATUS_PAID && $secondCcTransaction['status'] === Api::STATUS_PAID) {
+                    $payment->setAdditionalInformation('status', Api::STATUS_PAID);
+                }
             }
 
         }

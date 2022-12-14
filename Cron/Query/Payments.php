@@ -108,17 +108,16 @@ class Payments extends DataObject
             foreach ($orderCollection as $order) {
                 /** @var \Magento\Sales\Model\Order\Payment $payment */
                 $payment = $order->getPayment();
-                if ($pagseguroId = $payment->getAdditionalInformation('id')) {
-                    $response = $this->api->transaction()->consultCharge($pagseguroId);
-                    $statusCode = $response['status'];
-                    if ($statusCode == 200) {
-                        $transaction = $response['response'];
-                        $status = $transaction['status'];
-                        if ($payment->getMethod() == \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
-                            $this->helperTwoCardOrder->updateOrder($order, $status, $transaction);
-                        } else {
-                            $this->helperOrder->updateOrder($order, $status, $transaction);
-                        }
+                $pagseguroId = $payment->getAdditionalInformation('id');
+                $response = $this->api->transaction()->consultCharge($pagseguroId);
+                $statusCode = $response['status'];
+                if ($statusCode === 200) {
+                    $transaction = $response['response'];
+                    $status = $transaction['status'];
+                    if ($payment->getMethod() === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
+                        $this->helperTwoCardOrder->updateOrder($order, $status, $transaction);
+                    } else {
+                        $this->helperOrder->updateOrder($order, $status, $transaction);
                     }
                 }
             }

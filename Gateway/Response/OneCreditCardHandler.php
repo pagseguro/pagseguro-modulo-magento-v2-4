@@ -61,7 +61,10 @@ class OneCreditCardHandler implements HandlerInterface
         /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment = $paymentData->getPayment();
 
-        if (isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID) {
+        if (
+            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID &&
+            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_AUTHORIZED
+        ) {
             $message = $transaction['payment_response']['message'];
             throw new LocalizedException(__($message));
         }

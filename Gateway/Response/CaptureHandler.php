@@ -56,7 +56,7 @@ class CaptureHandler implements HandlerInterface
 
         if (isset($transaction['status'])) {
             $payment->setAdditionalInformation('status', $transaction['status']);
-            if ($transaction['status'] == Api::STATUS_PAID) {
+            if ($transaction['status'] === Api::STATUS_PAID) {
                 $payment->setAdditionalInformation('captured', true);
                 $payment->setAdditionalInformation('captured_amount', $transaction['amount']['summary']['paid']);
                 $payment->setAdditionalInformation('captured_date', date('Y-m-d h:i:s'));

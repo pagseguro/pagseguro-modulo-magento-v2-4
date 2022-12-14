@@ -115,21 +115,7 @@ class TwoCcDataAssignObserver extends AbstractDataAssignObserver
             $firstCcCanSave = isset($additionalData['cc_one_cc_save']) ? (int) $additionalData['cc_one_cc_save'] : 0;
             $secondCcCanSave = isset($additionalData['cc_two_cc_save']) ? (int) $additionalData['cc_two_cc_save'] : 0;
 
-            $firstSavedCardId = null;
-            if (isset($additionalData['cc_one_cc_id']) && $additionalData['cc_one_cc_id']) {
-                $cardInfo = $this->helperCard->getCardById($additionalData['cc_one_cc_id']);
-                if ($cardInfo && $cardInfo->getId()) {
-                    $firstSavedCardId = $cardInfo->getToken();
-                }
-            }
 
-            $secondSavedCardId = null;
-            if (isset($additionalData['cc_two_cc_id']) && $additionalData['cc_two_cc_id']) {
-                $cardInfo = $this->helperCard->getCardById($additionalData['cc_two_cc_id']);
-                if ($cardInfo && $cardInfo->getId()) {
-                    $secondSavedCardId = $cardInfo->getToken();
-                }
-            }
 
             $firstCcEncrypted = $additionalData['cc_one_cc_encrypted'] ?? null;
             $secondCcEncrypted = $additionalData['cc_two_cc_encrypted'] ?? null;

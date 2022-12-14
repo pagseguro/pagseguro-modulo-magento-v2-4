@@ -34,8 +34,8 @@
             <config_path>payment/pagseguropayment_pix/title</config_path>
         </field>
 
-        <field id="expiration_type" translate="label" type="select" sortOrder="201" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-            <label>Interest Type</label>
+        <field id="expiration_type" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Expiration Type</label>
             <source_model>PagSeguro\Payment\Model\Adminhtml\Source\PixExpirationType</source_model>
             <config_path>payment/pagseguropayment_pix/expiration_type</config_path>
         </field>

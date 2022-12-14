@@ -80,25 +80,25 @@ class CheckoutSubmitAllAfter implements ObserverInterface
             $payment = $order->getPayment();
 
             if ($paymentAction = $this->helper->getConfig('payment_action', $payment->getMethod())) {
-                if ($payment->getMethod() == \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE) {
-                    if ($paymentAction == MethodInterface::ACTION_ORDER) {
+                if ($payment->getMethod() === \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE) {
+                    if ($paymentAction === MethodInterface::ACTION_ORDER) {
                         $status = $payment->getAdditionalInformation('status');
-                        if ($status == Api::STATUS_PAID) {
+                        if ($status === Api::STATUS_PAID) {
                             $this->helperOrder->invoiceOrder($order, $payment,Invoice::CAPTURE_OFFLINE);
-                        } else if ($status == Api::STATUS_CANCELED) {
+                        } else if ($status === Api::STATUS_CANCELED) {
                             $this->helperOrder->cancelOrder($order, $payment);
                         }
                     }
                 }
 
-                if ($payment->getMethod() == \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
-                    if ($paymentAction == MethodInterface::ACTION_ORDER) {
+                if ($payment->getMethod() === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
+                    if ($paymentAction === MethodInterface::ACTION_ORDER) {
                         $firstCcStatus = $payment->getAdditionalInformation('first_cc_status');
                         $secondCcStatus = $payment->getAdditionalInformation('second_cc_status');
 
-                        if ($firstCcStatus == Api::STATUS_PAID && $secondCcStatus == Api::STATUS_PAID) {
+                        if ($firstCcStatus === Api::STATUS_PAID && $secondCcStatus === Api::STATUS_PAID) {
                             $this->helperOrder->invoiceOrder($order, $payment,Invoice::CAPTURE_OFFLINE);
-                        } else if ($firstCcStatus == Api::STATUS_CANCELED || $secondCcStatus == Api::STATUS_CANCELED) {
+                        } else if ($firstCcStatus === Api::STATUS_CANCELED || $secondCcStatus === Api::STATUS_CANCELED) {
                             $this->helperOrder->cancelOrder($order, $payment);
                         }
                     }

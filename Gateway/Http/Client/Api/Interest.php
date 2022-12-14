@@ -22,32 +22,19 @@ namespace PagSeguro\Payment\Gateway\Http\Client\Api;
 
 use Laminas\Http\Request;
 
-class OAuth extends Client
+class Interest extends Client
 {
 
-    public function getAccessToken($data = false, $url = false)
+    public function getInterestForInstallments($price, $maxInstallments, $installmentsWithoutInterest, $url = false)
     {
 
-      $path = $this->getEndpointPath('oauth_token');
+      $path = $this->getEndpointPath('fees_calculate');
       $this->setServiceUrl($url);
-      $api = $this->getApi($path, true);
-      $api->setMethod(Request::METHOD_POST);
-      $api->setRawBody($this->json->serialize($data));
+      $api = $this->getApiInterest($path, $price, $maxInstallments, $installmentsWithoutInterest);
+      $api->setMethod(Request::METHOD_GET);
 
       return $this->doRequest($api);
 
     }
 
-    public function removeAccessToken($data = false, $url = false)
-    {
-
-      $path = $this->getEndpointPath('oauth_revoke');
-      $this->setOAuthUrl($url);
-      $api = $this->getApi($path, true);
-      $api->setMethod(Request::METHOD_POST);
-      $api->setRawBody($this->json->serialize($data));
-
-      return $this->doRequest($api);
-
-    }
 }

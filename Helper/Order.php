@@ -144,6 +144,7 @@ class Order extends \Magento\Payment\Helper\Data
     public function updateOrder($order, $status, $transaction, $callbackUpdate = false)
     {
         try {
+            $this->helperData->log('TRANSAAAACTION');
             $this->helperData->log($transaction);
             /** @var \Magento\Sales\Model\Order\Payment $payment */
             $payment = $order->getPayment();
@@ -159,7 +160,7 @@ class Order extends \Magento\Payment\Helper\Data
             $formattedRefunded = $this->priceCurrency->format($refundedAmount / Data::ROUND_FACTOR , false);
 
             if ($amount && in_array($payment->getMethod(), $this->helperData->getAllowedMethods())) {
-                if ($status == Api::STATUS_PAID) {
+                if ($status === Api::STATUS_PAID) {
                     if ($refundedAmount) {
                         $order->addCommentToStatusHistory(__('Refund of %1', $formattedRefunded));
                         $this->orderRepository->save($order);
@@ -170,7 +171,7 @@ class Order extends \Magento\Payment\Helper\Data
                         $payment = $this->invoiceOrder($order, $payment, Invoice::CAPTURE_OFFLINE);
                         $payment->setAdditionalInformation('amount_captured', $amountPaid);
                     }
-                } else if ($status == Api::STATUS_CANCELED) {
+                } else if ($status === Api::STATUS_CANCELED) {
                     $payment = $this->cancelOrder($order, $payment);
                     $payment->setAdditionalInformation('amount_refunded', $refundedAmount);
                 } else {

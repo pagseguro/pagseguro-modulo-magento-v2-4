@@ -13,7 +13,6 @@ define(
             },
             totals: quote.getTotals(),
             isDisplayed: function() {
-                console.log(this.totals);
                 return this.isFullMode();
             },
 

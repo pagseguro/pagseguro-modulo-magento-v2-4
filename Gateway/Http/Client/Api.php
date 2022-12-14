@@ -23,6 +23,7 @@ namespace PagSeguro\Payment\Gateway\Http\Client;
 use PagSeguro\Payment\Gateway\Http\Client\Api\CredentialAuthentication;
 use PagSeguro\Payment\Gateway\Http\Client\Api\OAuth;
 use PagSeguro\Payment\Gateway\Http\Client\Api\Transaction;
+use PagSeguro\Payment\Gateway\Http\Client\Api\Interest;
 use PagSeguro\Payment\Helper\Data;
 use PagSeguro\Payment\Helper\Transaction as HelperTransaction;
 
@@ -60,6 +61,11 @@ class Api
     private $transaction;
 
     /**
+     * @var Interest
+     */
+    private $interest;
+
+    /**
      * @param Data $helper
      * @param HelperTransaction $helperTransaction
      * @param CredentialAuthentication $credentialAuthentication
@@ -71,13 +77,16 @@ class Api
         HelperTransaction $helperTransaction,
         CredentialAuthentication $credentialAuthentication,
         OAuth $oAuth,
-        Transaction $transaction
+        Transaction $transaction,
+        Interest $interest
     ) {
         $this->helperTransaction = $helperTransaction;
         $this->helper = $helper;
         $this->credentialAuthentication = $credentialAuthentication;
         $this->oAuth = $oAuth;
         $this->transaction = $transaction;
+        $this->interest = $interest;
+
     }
 
     /**
@@ -99,6 +108,11 @@ class Api
     public function transaction()
     {
         return $this->transaction;
+    }
+
+    public function interest()
+    {
+        return $this->interest;
     }
 
     /**
@@ -151,6 +165,8 @@ class Api
             $this->helper->log($e->getMessage());
         }
     }
+
+
 
     /**
      * @param $request

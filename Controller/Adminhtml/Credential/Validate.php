@@ -98,7 +98,11 @@ class Validate extends Action
         }
 
         if (isset($response['response']['public_key'])) {
-            $this->helper->saveConfig($response['response']['public_key'], 'public_key');
+            if ($url) {
+                $this->helper->saveConfig($this->helper->getGeneralConfig('public_key_sandbox'), 'public_key');
+            } else {
+                $this->helper->saveConfig($response['response']['public_key'], 'public_key');
+            }
         }
 
         return $response;

@@ -175,7 +175,7 @@ class TwoCard extends \Magento\Payment\Helper\Data
         $paymentMethod = new \stdClass();
         $paymentMethod->type = 'CREDIT_CARD';
         $paymentMethod->installments = $this->payment->getAdditionalInformation("second_cc_installments");
-        $paymentMethod->capture =  $this->helperData->getConfig('payment_action', $this->payment->getMethod()) == MethodInterface::ACTION_AUTHORIZE ? false : true;
+        $paymentMethod->capture =  $this->helperData->getConfig('payment_action', $this->payment->getMethod()) === MethodInterface::ACTION_AUTHORIZE ? false : true;
         $paymentMethod->card = $this->getCardData();
 
         return $paymentMethod;

@@ -56,8 +56,8 @@ class RefundHandler implements HandlerInterface
 
         $status = Api::STATUS_CANCELED;
         if (
-            $transaction['first_cc']['status'] == Api::STATUS_CANCELED
-            || $transaction['second_cc']['status'] == Api::STATUS_CANCELED
+            $transaction['first_cc']['status'] === Api::STATUS_CANCELED
+            || $transaction['second_cc']['status'] === Api::STATUS_CANCELED
         ) {
             $status = Api::STATUS_CANCELED;
         }
@@ -67,7 +67,7 @@ class RefundHandler implements HandlerInterface
 
         foreach ($transaction as $key => $charge) {
             if (isset($charge['status'])) {
-                if ($charge['status'] == Api::STATUS_CANCELED) {
+                if ($charge['status'] === Api::STATUS_CANCELED) {
                     $payment->setAdditionalInformation($key . '_status', $charge['status']);
                     $payment->setAdditionalInformation($key . '_refunded', true);
                     $payment->setAdditionalInformation($key . '_refunded_amount', $charge['amount']['summary']['refunded']);
