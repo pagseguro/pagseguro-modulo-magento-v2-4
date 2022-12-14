@@ -174,6 +174,8 @@ function (
                 if (result.isValid) {
                     creditCardData.pagseguroPaymentFirstCreditCardNumber = value;
                     self.firstCreditCardType(result.card.type);
+                    self.updateInstallmentsValues();
+
                 }
             });
 
@@ -200,6 +202,7 @@ function (
                 if (result.isValid) {
                     creditCardData.pagseguroPaymentSecondCreditCardNumber = value;
                     self.secondCreditCardType(result.card.type);
+                    self.updateInstallmentsValues();
                 }
             });
 
@@ -331,7 +334,10 @@ function (
                     method: 'POST',
                     cache: 'no-cache',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({'amount': self.firstCreditCardAmount()})
+                    body: JSON.stringify({
+                        'amount': self.firstCreditCardAmount(),
+                        'creditCardType': this.firstCreditCardType()
+                    })
                 }).then((response) => {
                     self.cardOneInstallments.removeAll();
                     return response.json();
@@ -348,7 +354,10 @@ function (
                     method: 'POST',
                     cache: 'no-cache',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({'amount': self.secondCreditCardAmount()})
+                    body: JSON.stringify({
+                        'amount': self.secondCreditCardAmount(),
+                        'creditCardType': this.secondCreditCardType()
+                    })
                 }).then((response) => {
                     self.cardTwoInstallments.removeAll();
                     return response.json();

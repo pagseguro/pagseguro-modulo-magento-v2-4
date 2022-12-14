@@ -125,6 +125,7 @@ function (
                 if (result.isValid) {
                     creditCardData.pagseguroPaymentCreditCardNumber = value;
                     self.creditCardType(result.card.type);
+                    self.updateInstallmentsValues();
                 }
             });
 
@@ -188,7 +189,7 @@ function (
          */
         retrieveInstallmentsUrl: function() {
             try {
-                this.installmentsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments;
+                this.installmentsUrl = window.checkoutConfig.payment.ccform.urls[this.getCode()].retrieve_installments + '?creditCardType=' + this.creditCardType();
                 return this.installmentsUrl;
             } catch (e) {
                 console.log('Installments URL not defined');
@@ -216,7 +217,7 @@ function (
                 fetch(self.retrieveCardsUrl(), {
                     method: 'GET',
                     cache: 'no-cache',
-                    headers: {'Content-Type': 'application/json'}
+                    headers: {'Content-Type': 'application/json'},
                 }).then((response) => {
                     return response.json();
                 }).then(json => {
@@ -240,7 +241,7 @@ function (
                 fetch(self.retrieveInstallmentsUrl(), {
                     method: 'GET',
                     cache: 'no-cache',
-                    headers: {'Content-Type': 'application/json'}
+                    headers: {'Content-Type': 'application/json'},
                 }).then((response) => {
                     return response.json();
                 }).then(json => {

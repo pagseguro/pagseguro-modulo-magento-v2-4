@@ -24,8 +24,6 @@ use Magento\Sales\Model\Order;
 
 /**
  * Class FinanceCost
- *
- * @package MercadoPago\Core\Block\Sales\Order\Totals
  */
 class Interest extends \Magento\Framework\View\Element\Template
 {

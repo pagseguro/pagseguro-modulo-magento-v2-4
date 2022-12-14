@@ -29,6 +29,7 @@ use PagSeguro\Payment\Helper\Transaction as HelperTransaction;
 
 class Api
 {
+    const STATUS_IN_ANALYSIS = 'IN_ANALYSIS';
     const STATUS_AUTHORIZED = 'AUTHORIZED';
     const STATUS_WAITING = 'WAITING';
     const STATUS_PAID = 'PAID';

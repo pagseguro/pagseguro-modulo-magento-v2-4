@@ -211,9 +211,6 @@ class TransactionRequest implements BuilderInterface
 
         } else if ($method === \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE) {
 
-            $this->helper->log('getPaymentData============================================');
-            $this->helper->log(print_r($this->helper->getConfig('payment_action', $method), true));
-
             $paymentMethod->type = 'CREDIT_CARD';
             $paymentMethod->installments = $payment->getAdditionalInformation('installments');
             $paymentMethod->capture = $this->helper->getConfig('payment_action', $method) === MethodInterface::ACTION_AUTHORIZE ? false : true;

@@ -62,8 +62,10 @@ class OneCreditCardHandler implements HandlerInterface
         $payment = $paymentData->getPayment();
 
         if (
-            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID &&
-            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_AUTHORIZED
+            isset($transaction['status']) &&
+            $transaction['status'] !== Api::STATUS_PAID &&
+            $transaction['status'] !== Api::STATUS_AUTHORIZED &&
+            $transaction['status'] !== Api::STATUS_IN_ANALYSIS
         ) {
             $message = $transaction['payment_response']['message'];
             throw new LocalizedException(__($message));

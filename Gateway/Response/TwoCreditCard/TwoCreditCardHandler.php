@@ -104,8 +104,10 @@ class TwoCreditCardHandler implements HandlerInterface
         $this->api->logRequest($payment);
 
         if (
-            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_PAID &&
-            isset($transaction['status']) && $transaction['status'] !== Api::STATUS_AUTHORIZED
+            isset($transaction['status']) &&
+            $transaction['status'] !== Api::STATUS_PAID &&
+            $transaction['status'] !== Api::STATUS_AUTHORIZED &&
+            $transaction['status'] !== Api::STATUS_IN_ANALYSIS
         ) {
             $message = $transaction['payment_response']['message'];
             throw new LocalizedException(__($message));
@@ -113,7 +115,11 @@ class TwoCreditCardHandler implements HandlerInterface
 
         if (isset($transaction['status'])) {
 
-            if ($transaction['status'] === Api::STATUS_PAID || $transaction['status'] === Api::STATUS_AUTHORIZED) {
+            if (
+                $transaction['status'] === Api::STATUS_PAID ||
+                $transaction['status'] === Api::STATUS_AUTHORIZED ||
+                $transaction['status'] !== Api::STATUS_IN_ANALYSIS
+            ) {
                 $secondCcResponse = $this->helperTwoCard->secondCardRequest($payment);
 
                 if (isset($secondCcResponse['transaction']['charges'])) {

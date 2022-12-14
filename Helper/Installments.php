@@ -65,15 +65,38 @@ class Installments extends AbstractHelper
         parent::__construct($context);
     }
 
-    public function getAllInstallments($price = null, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment')
+    public function getAllInstallments($price = null, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment', $creditCardType = 'VI')
     {
+
+        $amount = (int)round($price * Data::ROUND_FACTOR);
+
+        if ($creditCardType === 'VI') {
+            $creditCardType = 'visa';
+        }
+
+        if ($creditCardType === 'ELO') {
+            $creditCardType = 'elo';
+        }
+
+        if ($creditCardType === 'MC') {
+            $creditCardType = 'mastercard';
+        }
+
+        if ($creditCardType === 'HC') {
+            $creditCardType = 'hipercard';
+        }
+
+        if ($creditCardType === 'AE') {
+            $creditCardType = 'amex';
+        }
+
+        $getInstallmentsFromApi = $this->getInstallmentsFromApi($amount, $configGroup, $configSection);
+
+        $installmentPlans = $getInstallmentsFromApi['response']['payment_methods']['credit_card'][$creditCardType]['installment_plans'];
+
         $allInstallments = [
             ['value' => 1, 'text' => __('1x of %1 (without interest)', $this->priceCurrency->format($price, false))]
         ];
-
-        $testInterest = $this->getInstallmentsFromApi($price, $configGroup, $configSection);
-
-        $this->helper->log($testInterest);
 
         try {
             if ($price > 0) {
@@ -92,32 +115,24 @@ class Installments extends AbstractHelper
                 }
 
                 $maxInstallments = ($maxInstallments == 0) ? 1 : $maxInstallments;
-                for ($i = 2; $i <= $maxInstallments; $i++) {
-                    $interestRate = ($i <= $installmentsWithoutInterest) ? 0 : $defaultInterestRate;
-                    if (!$interestRate) {
-                        $interestType = $this->helper->getConfig('interest_type', $configGroup, $configSection);
-                        if ($interestType === 'per_installments') {
-                            // Interest per number of installments
-                            $interestRate = (float)$this->helper->getConfig('interest_' . $i . '_installments', $configGroup, $configSection) / 100;
-                        }
-                    }
-                    $this->helper->log($i);
-                    $this->helper->log($installmentsWithoutInterest);
-                    $value = ($i <= $installmentsWithoutInterest) ? ($price / $i) : $this->getInstallmentPrice($price, $i, $interestRate, $configGroup);
+                foreach ($installmentPlans as $planKey => $planValue) {
 
-                    $total = $value * $i;
-                    $hasInterest = $this->helper->getConfig('has_interest', $configGroup, $configSection);
-                    $interestText = ($hasInterest) ? __('with interest') : __('without interest');
+                    $installmentNumber = $planValue['installments'];
+
+                    $value = $planValue['installment_value'] / 100;
+
+                    $total = $planValue['amount']['value'] / 100;
+                    $interestFree = $planValue['interest_free'];
+                    $interestText = ($interestFree) ? __('without interest') : __('with interest');
 
                     $allInstallments[] = [
-                        'value' => $i,
+                        'value' => $installmentNumber,
                         'text' => __(
                             '%1x of %2 (%3). Total: %4',
-                            $i,
+                            $installmentNumber,
                             $this->priceCurrency->format($value, false),
                             $interestText,
-                            $this->priceCurrency->format($total, false),
-                            $this->priceCurrency->convert($interestRate)
+                            $this->priceCurrency->format($total, false)
                         )
                     ];
                 }
@@ -129,67 +144,24 @@ class Installments extends AbstractHelper
     }
 
     /**
-     * @param float $price
-     * @param int $installment
-     * @param float $interestRate
+     * Undocumented function
+     *
+     * @since 1.0.0
+     *
+     * @param [type] $price
+     * @param string $configGroup
      * @param string $configSection
-     * @return float
-     * @throws Exception
+     * @return object
      */
-    public function getInstallmentPrice($price, $installment, $interestRate = null, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment')
-    {
-        $installmentAmount = $price / $installment;
-        $this->helper->log($price);
-        try {
-            $installmentsWithoutInterest = (int)$this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection) ?: 1;
-            $hasInterest = $this->helper->getConfig('has_interest', $configGroup, $configSection);
-            if ($hasInterest && $installment > $installmentsWithoutInterest) {
-
-                if (!$interestRate) {
-                    $interestRate = (float)$this->helper->getConfig('interest_rate', $configGroup, $configSection);
-                }
-
-                $interestRate = $interestRate / 100;
-                $interestType = $this->helper->getConfig('interest_type', $configGroup, $configSection);
-
-                if ($interestRate || $interestType === 'per_installments') {
-                    switch ($interestType) {
-                        case 'price':
-                            //Amortization
-                            $installmentAmount = round($price * (($interestRate * pow((1 + $interestRate), $installment)) / (pow((1 + $interestRate), $installment) - 1)), 2);
-                            break;
-                        case 'compound':
-                            //M = C * (1 + i)^n
-                            $installmentAmount = ($price * pow(1 + $interestRate, $installment)) / $installment;
-                            break;
-                        case 'simple':
-                            //M = C * ( 1 + ( i * n ) )
-                            $installmentAmount = ($price * (1 + ($installment * $interestRate))) / $installment;
-                            break;
-                        case 'per_installments':
-                            // Interest per number of installments
-                            $interestRate = (float)$this->helper->getConfig('interest_' . $installment . '_installments', $configGroup, $configSection) / 100;
-                            $installmentAmount = ($price * (1 + $interestRate)) / $installment;
-                            break;
-                    }
-                } else {
-                    if ($installment) {
-                        $installmentAmount = $price / $installment;
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            $this->_logger->error($e->getMessage());
-        }
-
-        return $installmentAmount;
-    }
-
     public function getInstallmentsFromApi($price, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment')
     {
 
         $maxInstallments = (int) $this->helper->getConfig('max_installments', $configGroup, $configSection) ?: 1;
-        $installmentsWithoutInterest = (int) $this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection) ?: 1;
+        $installmentsWithoutInterest = (int) $this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection) ?: 0;
+
+        if ($installmentsWithoutInterest == 1) {
+            $installmentsWithoutInterest = 0;
+        }
 
         return $this->api->interest()->getInterestForInstallments($price, $maxInstallments, $installmentsWithoutInterest);
     }

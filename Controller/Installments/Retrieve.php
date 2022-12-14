@@ -87,7 +87,9 @@ class Retrieve extends Action implements ActionInterface
             $result->setJsonData($this->json->serialize(
                 $this->helperInstallments->getAllInstallments(
                     ($grandTotal - $interestRate),
-                    \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE
+                    \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE,
+                    'payment',
+                    $this->getRequest()->getParam('creditCardType')
                 )
             ));
             $result->setHttpResponseCode(200);

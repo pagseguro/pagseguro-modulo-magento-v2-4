@@ -245,7 +245,6 @@
                         <select name="payment[installments]"
                                 class="select"
                                 data-bind="attr: {'id': getCode() + '_cc_installments', 'data-validate': JSON.stringify({required:true})},
-                                    enable: updateInstallmentsValues(),
                                     options: installments,
                                     optionsValue: 'value',
                                     optionsText: 'text',
