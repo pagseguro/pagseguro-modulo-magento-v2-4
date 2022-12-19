@@ -61,8 +61,6 @@ class OAuthCodeBackend extends \Magento\Framework\App\Config\Value
         Api $api,
         \Magento\Framework\UrlInterface $urlInterface,
         ManagerInterface $messageManager,
-        WriterInterface $configWriter,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->urlInterface = $urlInterface;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, []);

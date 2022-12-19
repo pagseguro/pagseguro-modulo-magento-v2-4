@@ -144,8 +144,6 @@ class Order extends \Magento\Payment\Helper\Data
     public function updateOrder($order, $status, $transaction, $callbackUpdate = false)
     {
         try {
-            $this->helperData->log('TRANSAAAACTION');
-            $this->helperData->log($transaction);
             /** @var \Magento\Sales\Model\Order\Payment $payment */
             $payment = $order->getPayment();
             $currentStatus = $payment->getAdditionalInformation('status');

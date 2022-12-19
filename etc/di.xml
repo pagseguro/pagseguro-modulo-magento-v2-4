@@ -519,4 +519,5 @@
             <argument name="resourceModel" xsi:type="string">PagSeguro\Payment\Model\ResourceModel\Transaction</argument>
         </arguments>
     </virtualType>
+
 </config>

@@ -71,8 +71,6 @@ class OAuth extends Action
     {
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
-        $this->helper->log($response);
-
         try {
             $this->exchangeCode();
             $response->setHttpResponseCode(200);
@@ -97,21 +95,6 @@ class OAuth extends Action
 
         $response = $this->api->oAuth()->getAccessToken($data, $url);
 
-        $this->helper->log($data);
-
-        $this->helper->log($response);
-
-        /*
-        if ($response['status'] < 200 || $response['status'] >= 300) {
-            $message = __('There was an error trying to validate your credential. Please check if your token is correct');
-            $this->messageManager->addErrorMessage($message);
-            $this->hasError = true;
-        }
-
-        if (isset($response['response']['public_key'])) {
-            $this->helper->saveConfig($response['response']['public_key'], 'public_key');
-        }
-        */
         return $response;
     }
 }

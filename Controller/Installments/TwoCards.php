@@ -112,7 +112,7 @@ class TwoCards extends Action implements \Magento\Framework\App\CsrfAwareActionI
             $content = $this->getRequest()->getContent();
             $request = $this->json->unserialize($content);
         } catch (\Exception $e) {
-            $this->helperData->log($e->getMessage(), self::LOG_NAME);
+            $this->helperData->log($e->getMessage());
         }
         return $request;
     }

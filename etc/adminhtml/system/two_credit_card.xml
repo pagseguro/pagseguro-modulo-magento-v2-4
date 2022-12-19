@@ -83,6 +83,18 @@
             <config_path>payment/pagseguropayment_two_cc/paid_order_status</config_path>
         </field>
 
+        <field id="max_installments" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Max Installments</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Installments</source_model>
+            <config_path>payment/pagseguropayment_two_cc/max_installments</config_path>
+        </field>
+
+        <field id="max_installments_without_interest" translate="label" type="select" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Max Installments Without Interest</label>
+            <source_model>PagSeguro\Payment\Model\Adminhtml\Source\Installments</source_model>
+            <config_path>payment/pagseguropayment_two_cc/max_installments_without_interest</config_path>
+        </field>
+
         <field id="sort_order" translate="label" type="text" sortOrder="10000" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Sort Order</label>

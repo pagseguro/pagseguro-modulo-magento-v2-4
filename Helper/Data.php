@@ -261,20 +261,14 @@ class Data extends \Magento\Payment\Helper\Data
     protected function getCodeVerifier()
     {
 
-        $n = '100';
-
+        $limit = '1024';
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
         $randomString = '';
 
-        for ($i = 0; $i < $n; $i++) {
-
+        for ($i = 0; $i < $limit; $i++) {
             $index = rand(0, strlen($characters) - 1);
-
             $randomString .= $characters[$index];
-
         }
-
         return rtrim(strtr(base64_encode($randomString), "+/", "-_"), "=");
 
     }

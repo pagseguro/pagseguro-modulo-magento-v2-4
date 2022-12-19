@@ -26,6 +26,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Observer\AbstractDataAssignObserver;
 use Magento\Quote\Api\CartRepositoryInterface;
 use PagSeguro\Payment\Helper\Card as HelperCard;
+use PagSeguro\Payment\Helper\Installments;
 
 class OneCcDataAssignObserver extends AbstractDataAssignObserver
 {
@@ -45,6 +46,11 @@ class OneCcDataAssignObserver extends AbstractDataAssignObserver
     private $helperCard;
 
     /**
+     * @var InstallmentsCard
+     */
+    private $helperInstalments;
+
+    /**
      * DataAssignObserver constructor.
      * @param CartRepositoryInterface $quoteRepository
      * @param Session $checkoutSession
@@ -53,11 +59,13 @@ class OneCcDataAssignObserver extends AbstractDataAssignObserver
     public function __construct(
         CartRepositoryInterface $quoteRepository,
         Session $checkoutSession,
-        HelperCard $helperCard
+        HelperCard $helperCard,
+        Installments $helperInstalments
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->checkoutSession = $checkoutSession;
         $this->helperCard = $helperCard;
+        $this->helperInstalments = $helperInstalments;
     }
 
     /**
@@ -116,6 +124,19 @@ class OneCcDataAssignObserver extends AbstractDataAssignObserver
         }
 
     }
+
+    /**
+     * @param $installments
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getInstallment($amount, $installment)
+    {
+        $this->checkoutSession->setData('pagseguropayment_installments', $installments);
+        $quote = $this->checkoutSession->getQuote();
+        $quote->setTotalsCollectedFlag(false)->collectTotals();
+    }
+
 
     /**
      * @param $installments

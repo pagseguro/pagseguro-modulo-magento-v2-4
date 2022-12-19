@@ -122,7 +122,7 @@ class OAuth extends Field
 
             $oauthEndpoint = $this->getUrl('pagseguropayment/credential/oauth', ['storeId' => $storeId]);
 
-            $code_url = $this->helperData->getOAuthCodeUrl();
+            $codeUrl = $this->helperData->getOAuthCodeUrl();
 
             $html = "
                 <button
@@ -130,7 +130,7 @@ class OAuth extends Field
                     id=\"pagseguro-oauth-button\"
                     title=\"{$title}\"
                     data-exchange-url=\"{$oauthEndpoint}\"
-                    data-code-url=\"{$code_url}\"
+                    data-code-url=\"{$codeUrl}\"
                     data-code-verifier=\"{$oauthUrl['code_verifier']}\"
                     class=\"button\"
                     onclick=\"paseguroOauthRedirect.call(this, '{$oauthUrl['url']}')\">

@@ -18,43 +18,26 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace PagSeguro\Payment\Controller\Adminhtml\Credential;
+namespace PagSeguro\Payment\Block\Adminhtml\Order;
 
-use PagSeguro\Payment\Gateway\Http\Client\Api;
+use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Store\Model\Store;
 use PagSeguro\Payment\Helper\Data as HelperData;
+use Magento\Backend\Block\Template\Context;
 
-class OAuthCode extends \Magento\Framework\App\Config\Value
+class CaptureButton
 {
 
-    /**
-     * @var HelperData
-     */
-    private $helper;
+    public function beforeGetOrderId(\Magento\Sales\Block\Adminhtml\Order\View $subject){
+        $subject->addButton(
+                'mybutton',
+                ['label' => __('My Buttion'), 'onclick' => 'setLocation(window.location.href)', 'class' => 'reset'],
+                -1
+            );
 
-    /**
-     * @var Api
-     */
-    private $api;
-
-    /**
-     * @var bool
-     */
-    private $hasError;
-
-    public function __construct(
-        HelperData $helperData,
-        Api $api
-    ) {
-        parent::construct();
-        $this->helper = $helperData;
-        $this->api = $api;
-        $this->hasError = false;
-
-        $this->helper->log($this->getValue());
+        return null;
     }
 
-    public function beforeSave()
-    {
-        return parent::beforeSave();
-    }
 }

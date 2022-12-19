@@ -155,7 +155,7 @@ class TransactionRequest implements BuilderInterface
         if ($method === \PagSeguro\Payment\Model\Pix\Ui\ConfigProvider::CODE) {
             $request->qr_codes = $this->getQRCodesData($amount, $payment);
         } else {
-            $request->charges = [$this->getChargeData($request, $payment, $amount)];
+            $request->charges = [$this->getChargeData($request, $payment, $amount, $method)];
         }
 
         $request->notification_urls = [
@@ -176,12 +176,17 @@ class TransactionRequest implements BuilderInterface
      * @return \stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function getChargeData($request, $payment, $amount)
+    protected function getChargeData($request, $payment, $amount, $method = null)
     {
         $charge = new \stdClass();
         $charge->reference_id = $this->getOrder()->getIncrementId();
         $charge->description = __(sprintf("Online Purchase - #%s", $this->getOrder()->getIncrementId()));
-        $charge->amount = $this->getChargeAmount($amount);
+        if ($method === \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE || $method === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
+            $charge->amount = $this->getAmountForCreditCard();
+        } else {
+            $charge->amount = $this->getChargeAmount($amount);
+        }
+
         // Payment Method Data
         $charge->payment_method = $this->getPaymentData($request, $payment, $amount);
         $charge->notification_urls = [
@@ -194,12 +199,25 @@ class TransactionRequest implements BuilderInterface
      * @param \stdClass $request
      * @param \Magento\Sales\Model\Order\Payment\Interceptor $payment
      * @param float $amount
-     * @param string $buyerId
+     * @param string $method
      *
      * @return \stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function getPaymentData($request, $payment, $amount)
+    protected function getAmountForCreditCard($request, $payment, $amount, $method = null)
+    {
+        $installments = $payment->getAdditionalInformation('installments');
+
+    }
+
+    /**
+     * @param \stdClass $request
+     * @param \Magento\Sales\Model\Order\Payment\Interceptor $payment
+     *
+     * @return \stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function getPaymentData($request, $payment)
     {
         $method = $payment->getMethod();
 
