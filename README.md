@@ -8,6 +8,14 @@
 
 Esse módulo é compatível com a versão 2.4 do Magento. Ele utiliza a API Charge do PagSeguro, sendo capaz de fazer transações para pagamentos com boleto, um cartão de crédito ou dois cartões de crédito.
 
+## Documentação Oficial
+
+- Instalando e configurando o módulo Magento 2.4 (passo a passo detalhado, com imagens sobre como instalar e configurar o Módulo)
+  - https://dev.pagseguro.uol.com.br/docs/instalando-o-magento-24
+
+- Boas práticas de desenvolvimento:
+  - https://dev.pagseguro.uol.com.br/docs/boas-pr%C3%A1ticas-de-desenvolvimento
+
 ## Instalação utilizando composer
 
 - composer config repositories.pagseguro-pagseguropayment git https://bitbucket.org/gingainterno/magento-v1-charge/src/master/ *OBS.: É NECESSÁRIO ALTERAR ESSE REPOSITÓRIO PARA UM OFICIAL DO PAGSEGURO*
