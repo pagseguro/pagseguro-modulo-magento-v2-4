@@ -75,21 +75,6 @@ class Interest extends AbstractTotal
     {
         $installments = 0;
 
-        /** @var \Magento\Quote\Model\Quote $quote */
-        $quoteId = $this->checkoutSession->getQuoteId();
-        if ($quoteId) {
-            $quote = $this->quoteRepository->get($quoteId);
-            $method = $quote->getPayment()->getMethod();
-            if ($method === \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE) {
-                $installments = (int)$this->checkoutSession->getData('pagseguropayment_installments');
-            } else if ($method === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
-                $installments = [
-                    'first_cc' => (int)$this->checkoutSession->getData('first_pagseguropayment_installments'),
-                    'second_cc' => (int)$this->checkoutSession->getData('second_pagseguropayment_installments'),
-                ];
-            }
-        }
-
         return $installments;
     }
 

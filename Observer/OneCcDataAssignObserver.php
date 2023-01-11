@@ -117,6 +117,7 @@ class OneCcDataAssignObserver extends AbstractDataAssignObserver
                 'cc_exp_year' => $ccExpYear
             ]);
 
+            $paymentInfo->setAdditionalInformation('cc_type', $ccType);
             $paymentInfo->setAdditionalInformation('cc_encrypted', $ccEncrypted);
             $paymentInfo->setAdditionalInformation('installments', $installments);
             $paymentInfo->setAdditionalInformation('cc_id', $ccId);

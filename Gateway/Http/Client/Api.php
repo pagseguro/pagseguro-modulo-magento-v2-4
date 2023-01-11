@@ -175,7 +175,6 @@ class Api
      */
     public function logRequest($request, $name = 'pagseguropayment')
     {
-        $this->helper->log('REQUEST', $name);
         if (isset($request->payment_method->card->security_code)) {
             $request->payment_method->card->security_code = null;
         }

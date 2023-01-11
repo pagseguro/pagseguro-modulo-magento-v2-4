@@ -31,6 +31,7 @@ use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
+use PagSeguro\Payment\Helper\Installments;
 
 class TransactionRequest implements BuilderInterface
 {
@@ -77,6 +78,11 @@ class TransactionRequest implements BuilderInterface
     protected $order;
 
     /**
+     * @var Installments
+     */
+    private $helperInstallments;
+
+    /**
      * @param Context $context
      * @param Data $helper
      * @param DateTime $date
@@ -92,7 +98,8 @@ class TransactionRequest implements BuilderInterface
         ConfigInterface $config,
         Api $api,
         ManagerInterface $eventManager,
-        CustomerRepositoryInterface $customer
+        CustomerRepositoryInterface $customer,
+        Installments $helperInstallments
     )
     {
         $this->context = $context;
@@ -102,6 +109,7 @@ class TransactionRequest implements BuilderInterface
         $this->api = $api;
         $this->eventManager = $eventManager;
         $this->customer = $customer;
+        $this->helperInstallments = $helperInstallments;
     }
 
     /**
@@ -162,8 +170,6 @@ class TransactionRequest implements BuilderInterface
             $this->helper->getUrlBuilder()->getUrl('pagseguropayment/notification/order')
         ];
 
-        $this->api->logRequest($request);
-
         return ['request' => $request];
     }
 
@@ -182,7 +188,7 @@ class TransactionRequest implements BuilderInterface
         $charge->reference_id = $this->getOrder()->getIncrementId();
         $charge->description = __(sprintf("Online Purchase - #%s", $this->getOrder()->getIncrementId()));
         if ($method === \PagSeguro\Payment\Model\OneCreditCard\Ui\ConfigProvider::CODE || $method === \PagSeguro\Payment\Model\TwoCreditCard\Ui\ConfigProvider::CODE) {
-            $charge->amount = $this->getAmountForCreditCard();
+            $charge->amount = $this->getAmountForCreditCard($payment, $amount);
         } else {
             $charge->amount = $this->getChargeAmount($amount);
         }
@@ -192,6 +198,7 @@ class TransactionRequest implements BuilderInterface
         $charge->notification_urls = [
             $this->helper->getUrlBuilder()->getUrl('pagseguropayment/notification/order')
         ];
+        $this->helper->log($charge);
         return $charge;
     }
 
@@ -204,10 +211,19 @@ class TransactionRequest implements BuilderInterface
      * @return \stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function getAmountForCreditCard($request, $payment, $amount, $method = null)
+    protected function getAmountForCreditCard($payment, $amount)
     {
         $installments = $payment->getAdditionalInformation('installments');
+        $installmentPlan = $this->helperInstallments->getInstallmentPrice($amount, $installments, $payment->getAdditionalInformation('cc_type'));
 
+        if ($installmentPlan['interest_free']) {
+            $chargeAmount = new \stdClass();
+            $chargeAmount->value = $amount;
+            $chargeAmount->currency = "BRL";
+            return $chargeAmount;
+        }
+
+        return $installmentPlan['amount'];
     }
 
     /**

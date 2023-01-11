@@ -288,9 +288,7 @@ function (
                 expYear: this.creditCardExpYear(),
                 securityCode: this.creditCardVerificationNumber()
             });
-            console.log(pagseguroEncrypt)
             this.creditCardEncrypted = pagseguroEncrypt.encryptedCard;
-            console.log(this.creditCardEncrypted)
         },
     });
 }

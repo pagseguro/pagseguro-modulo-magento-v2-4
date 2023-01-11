@@ -222,7 +222,7 @@ class TransactionRequest implements BuilderInterface
         $charge = new \stdClass();
         $charge->reference_id = $this->getOrder()->getIncrementId();
         $charge->description = __(sprintf("Online Purchase - #%s", $this->getOrder()->getIncrementId()));
-        $charge->amount = $this->getChargeAmount($amount);
+        $charge->amount = $this->getChargeAmount($payment, $amount);
         // Payment Method Data
         $charge->payment_method = $this->getPaymentData($request, $payment, $amount);
         $charge->notification_urls = [
@@ -272,17 +272,23 @@ class TransactionRequest implements BuilderInterface
     }
 
     /**
+     * @param $payment
      * @param $amount
      * @return \stdClass
      */
-    protected function getChargeAmount($amount)
+    protected function getChargeAmount($payment, $amount)
     {
-        $amount = (int)round($amount * Data::ROUND_FACTOR);
+        $installments = $payment->getAdditionalInformation('installments');
+        $installmentPlan = $this->helperInstallment->getInstallmentPrice($amount, $installments, $payment->getAdditionalInformation('cc_type'));
 
-        $chargeAmount = new \stdClass();
-        $chargeAmount->value = $amount;
-        $chargeAmount->currency = "BRL";
-        return $chargeAmount;
+        if ($installmentPlan['interest_free']) {
+            $chargeAmount = new \stdClass();
+            $chargeAmount->value = $amount;
+            $chargeAmount->currency = "BRL";
+            return $chargeAmount;
+        }
+
+        return $installmentPlan['amount'];
     }
 
     /**

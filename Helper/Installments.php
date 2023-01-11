@@ -66,8 +66,12 @@ class Installments extends AbstractHelper
         parent::__construct($context);
     }
 
-    public function getAllInstallments($price = null, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment', $creditCardType = 'VI')
+    public function getAllInstallments($price = null, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment', $creditCardType = null)
     {
+
+        if ($creditCardType === null) {
+            return [];
+        }
 
         $amount = (int)round($price * Data::ROUND_FACTOR);
 
@@ -101,6 +105,7 @@ class Installments extends AbstractHelper
                 $installmentsWithoutInterest = (int)$this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection) ?: 1;
 
                 $maxInstallments = ($maxInstallments == 0) ? 1 : $maxInstallments;
+
                 foreach ($installmentPlans as $planKey => $planValue) {
 
                     $installmentNumber = $planValue['installments'];
@@ -146,11 +151,11 @@ class Installments extends AbstractHelper
         return $allInstallments;
     }
 
-    public function getInstallmentPrice($price = null, $installment = 1, $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment', $creditCardType = 'VI')
+    public function getInstallmentPrice($price = null, $installment = 1, $creditCardType = 'VI', $configGroup = 'pagseguropayment_one_cc', $configSection = 'payment')
     {
         $amount = (int)round($price * Data::ROUND_FACTOR);
 
-        if ($creditCardType === 'VI') {
+        if ($creditCardType === null || $creditCardType === 'VI') {
             $creditCardType = 'visa';
         }
 
@@ -173,6 +178,8 @@ class Installments extends AbstractHelper
         $getInstallmentsFromApi = $this->getInstallmentsFromApi($amount, $configGroup, $configSection);
 
         $installmentPlans = $getInstallmentsFromApi['response']['payment_methods']['credit_card'][$creditCardType]['installment_plans'];
+
+        $installmentsWithoutInterest = (int)$this->helper->getConfig('max_installments_without_interest', $configGroup, $configSection) ?: 1;
 
         return $installmentPlans[$installment];
     }
