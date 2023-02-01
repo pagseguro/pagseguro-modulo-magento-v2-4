@@ -261,7 +261,7 @@ class Data extends \Magento\Payment\Helper\Data
     protected function getCodeVerifier()
     {
 
-        $limit = '1024';
+        $limit = '100';
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randomString = '';
 
