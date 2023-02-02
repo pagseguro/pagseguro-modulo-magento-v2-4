@@ -45,7 +45,6 @@ class OAuthCode extends Field
         $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/custom.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        $logger->debug(print_r(['motherfucker' => 'ohyeah'], true));
         $html = "<input type='hidden'id='pagseguro-oauth-code' id='pagseguro-oauth-code'/>";
 
         return $html;
