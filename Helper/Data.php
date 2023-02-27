@@ -32,6 +32,7 @@ use Magento\Framework\Serialize\Serializer\Json;
 use PagSeguro\Payment\Logger\Logger;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order;
+use \Magento\Framework\Math\Random;
 
 /**
  * Class Data
@@ -63,6 +64,11 @@ class Data extends \Magento\Payment\Helper\Data
      */
     private $urlBuilder;
 
+    /**
+     * @var Random
+     */
+    private $mathRandom;
+
 
     public function __construct(
         Context $context,
@@ -73,13 +79,15 @@ class Data extends \Magento\Payment\Helper\Data
         Initial $initialConfig,
         Logger $logger,
         WriterInterface $configWriter,
-        Json $json
+        Json $json,
+        Random $mathRandom
     ) {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
         $this->urlBuilder = $context->getUrlBuilder();
         $this->logger = $logger;
         $this->configWriter = $configWriter;
         $this->json = $json;
+        $this->mathRandom = $mathRandom;
     }
 
     /**
@@ -229,6 +237,7 @@ class Data extends \Magento\Payment\Helper\Data
     public function getPublicKey()
     {
         $publicKey = $this->getConfig('public_key');
+
         if (!$publicKey) {
             /** @var PagSeguro_Payment_Model_Service_Authentication $authenticationService */
             $authenticationService = Mage::getModel('pagseguropayment/service_authentication');
@@ -260,17 +269,7 @@ class Data extends \Magento\Payment\Helper\Data
 
     protected function getCodeVerifier()
     {
-
-        $limit = '100';
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $randomString = '';
-
-        for ($i = 0; $i < $limit; $i++) {
-            $index = rand(0, strlen($characters) - 1);
-            $randomString .= $characters[$index];
-        }
-        return rtrim(strtr(base64_encode($randomString), "+/", "-_"), "=");
-
+        return $this->mathRandom->getRandomString(32);
     }
 
     protected function getCodeChallenge()

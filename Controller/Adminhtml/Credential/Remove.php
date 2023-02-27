@@ -92,6 +92,10 @@ class Remove extends Action
 
         $url = $this->getRequest()->getParam('sandbox');
 
+        $removeToken = $this->helper->saveConfig('', 'token');
+
+        $removePublicKey = $this->helper->saveConfig('', 'public_key');
+
         $data = [
             'token_type_hint'   => 'access_token',
             'token'             => $token
@@ -99,24 +103,6 @@ class Remove extends Action
 
         $response = $this->api->oAuth()->removeAccessToken($data, $url);
 
-        $removeToken = $this->helper->saveConfig('', 'token');
-
-        $this->helper->log($removeToken);
-
-        $this->helper->log($response);
-
-
-        /*
-        if ($response['status'] < 200 || $response['status'] >= 300) {
-            $message = __('There was an error trying to validate your credential. Please check if your token is correct');
-            $this->messageManager->addErrorMessage($message);
-            $this->hasError = true;
-        }
-
-        if (isset($response['response']['public_key'])) {
-            $this->helper->saveConfig($response['response']['public_key'], 'public_key');
-        }
-        */
         return $removeToken;
     }
 }

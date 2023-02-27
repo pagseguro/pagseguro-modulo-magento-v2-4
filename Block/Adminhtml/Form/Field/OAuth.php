@@ -61,7 +61,7 @@ class OAuth extends Field
         if ($maybeCodeVerifier || $token) {
 
             // Replace field markup with validation button
-            $title = __('Remover Autorização');
+            $title = __('Remove Authorization');
 
             $storeId = 0;
             if ($this->getRequest()->getParam('website')) {
@@ -97,7 +97,7 @@ class OAuth extends Field
         } else {
 
             // Replace field markup with validation button
-            $title = __('Autorize a sua conta');
+            $title = __('Authorize your Account');
 
             $storeId = 0;
 

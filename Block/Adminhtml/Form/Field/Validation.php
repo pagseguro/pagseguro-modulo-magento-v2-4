@@ -56,11 +56,12 @@ class Validation extends Field
 
         $html = '';
         $token = $this->helperData->getGeneralConfig('token');
+        $publicKey = $this->helperData->getConfig('public_key');
 
-        if ($token) {
+        if ($token && !$publicKey) {
 
             // Replace field markup with validation button
-            $title = __('Valide a sua conta');
+            $title = __('Validate Credentials');
             $storeId = 0;
 
             if ($this->getRequest()->getParam('website')) {

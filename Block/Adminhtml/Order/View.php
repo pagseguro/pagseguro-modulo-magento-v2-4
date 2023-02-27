@@ -33,7 +33,7 @@ class CaptureButton
     public function beforeGetOrderId(\Magento\Sales\Block\Adminhtml\Order\View $subject){
         $subject->addButton(
                 'mybutton',
-                ['label' => __('My Buttion'), 'onclick' => 'setLocation(window.location.href)', 'class' => 'reset'],
+                ['label' => __('Capture'), 'onclick' => 'setLocation(window.location.href)', 'class' => 'reset'],
                 -1
             );
 

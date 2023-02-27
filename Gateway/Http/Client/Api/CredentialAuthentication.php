@@ -31,15 +31,43 @@ class CredentialAuthentication extends Client
     {
         $this->setToken($token);
         $this->setServiceUrl($url);
-        $path = $this->getEndpointPath('check_authentication');
+        $path = $this->getEndpointPath('get_public_key');
         $api = $this->getApi($path);
         $api->setMethod(Request::METHOD_GET);
 
         $response = $api->send();
 
+        if (!$response || $response->getStatusCode() == 404) {
+            return $this->post($token, $url);
+        }
+
         return [
-            'status' => $response->getStatusCode(),
-            'response' => $this->json->unserialize($response->getContent())
+            'status'    => $response->getStatusCode(),
+            'response'  => $this->json->unserialize($response->getContent())
+        ];
+
+
+    }
+
+    /**
+     * @return array
+     */
+    public function post($token = false, $url = false)
+    {
+        $this->setToken($token);
+        $this->setServiceUrl($url);
+        $path = $this->getEndpointPath('create_public_key');
+        $api = $this->getApi($path);
+        $api->setMethod(Request::METHOD_POST);
+        $api->setRawBody($this->json->serialize([
+            "type" => "card"
+        ]));
+
+        $response = $api->send();
+
+        return [
+            'status'    => $response->getStatusCode(),
+            'response'  => $this->json->unserialize($response->getContent())
         ];
     }
 }

@@ -89,14 +89,16 @@ class Validate extends Action
     {
         $token = $this->getRequest()->getParam('token');
         $url = $this->getRequest()->getParam('sandbox');
+        $this->helper->log('Debug: ' . $token . ' - ' . $url);
         $response = $this->api->credentialAuthentication()->get($token, $url);
 
+        $this->helper->log(print_r($response, true));
         if ($response['status'] < 200 || $response['status'] >= 300) {
             $message = __('There was an error trying to validate your credential. Please check if your token is correct');
             $this->messageManager->addErrorMessage($message);
             $this->hasError = true;
         }
-
+        $this->helper->log(print_r($response, true));
         if (isset($response['response']['public_key'])) {
             if ($url) {
                 $this->helper->saveConfig($this->helper->getGeneralConfig('public_key_sandbox'), 'public_key');

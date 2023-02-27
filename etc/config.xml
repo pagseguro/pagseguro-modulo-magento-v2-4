@@ -44,7 +44,8 @@
                 <capture>charges/{{id}}/capture</capture>
                 <cancel>charges/{{id}}/cancel</cancel>
                 <fees_calculate>charges/fees/calculate</fees_calculate>
-                <check_authentication>public-keys/card</check_authentication>
+                <get_public_key>public-keys/card</get_public_key>
+                <create_public_key>public-keys</create_public_key>
                 <oauth_token>oauth2/token</oauth_token>
                 <oauth_revoke>oauth2/revoke</oauth_revoke>
             </endpoints>

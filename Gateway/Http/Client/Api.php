@@ -167,8 +167,6 @@ class Api
         }
     }
 
-
-
     /**
      * @param $request
      * @param string $name
