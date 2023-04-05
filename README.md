@@ -1,4 +1,7 @@
-![N|Solid](https://upload.wikimedia.org/wikipedia/commons/8/80/Logo_PagSeguro.png)
+# Esse módulo foi DEPRECIADO!!!!!
+**Recomendamos usar o novo módulo Magento 2 PagSeguro** na url: https://github.com/pagseguro/payment-magento
+
+-----
 
 # PagSeguro - Módulo Magento 2.4
 
